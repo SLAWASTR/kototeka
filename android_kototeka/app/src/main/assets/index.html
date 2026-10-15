@@ -191,6 +191,7 @@
         <div class="form-group">
           <label class="form-label" for="catDateInput"><span>📅</span> Дата и время встречи</label>
           <input type="datetime-local" id="catDateInput" class="form-input" required>
+          <div id="catDateDetectedNotice" style="display:none; font-size:0.75rem; color:#ea580c; font-weight:600; margin-top:4px;"></div>
         </div>
 
         <!-- Color Selector Chips -->
@@ -356,6 +357,26 @@
           <span>✈️</span> Отправить в Telegram
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: Приветствие и выбор имени при первом входе
+       ========================================================================= -->
+  <div id="welcomeUserModal" class="modal-overlay">
+    <div class="modal-sheet" style="max-width:380px; text-align:center;">
+      <div style="font-size:3rem; margin-bottom:8px;">🐾</div>
+      <h3 class="modal-title" style="justify-content:center; font-size:1.3rem;">Добро пожаловать в Кототеку!</h3>
+      <p style="font-size:0.88rem; color:var(--text-subtle); margin:8px 0 16px; line-height:1.4;">
+        Как вас зовут, исследователь городских котиков? Ваше имя будет украшать карточки находок и открытки для Telegram!
+      </p>
+
+      <form id="welcomeUserForm" style="display:flex; flex-direction:column; gap:12px;">
+        <input type="text" id="welcomeUsernameInput" class="form-input" placeholder="Ваше имя или позывной..." maxlength="30" required autofocus />
+        <button type="submit" class="btn-primary" style="justify-content:center; padding:12px;">
+          <span>🚀</span> Начать сбор котиков!
+        </button>
+      </form>
     </div>
   </div>
 

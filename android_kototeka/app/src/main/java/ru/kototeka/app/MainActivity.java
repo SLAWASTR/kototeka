@@ -2,9 +2,11 @@ package ru.kototeka.app;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -25,6 +27,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,6 +47,7 @@ public class MainActivity extends Activity {
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
     private Uri cameraImageUri;
+    private File currentPhotoFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,11 +128,28 @@ public class MainActivity extends Activity {
                 try {
                     File photoFile = createImageFile();
                     if (photoFile != null) {
-                        cameraImageUri = Uri.fromFile(photoFile);
+                        currentPhotoFile = photoFile;
+                        cameraImageUri = FileProvider.getUriForFile(
+                            MainActivity.this,
+                            getPackageName() + ".fileprovider",
+                            photoFile
+                        );
+
                         takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri);
+                        takePictureIntent.setClipData(ClipData.newRawUri("", cameraImageUri));
+                        takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+                        List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(takePictureIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                        for (ResolveInfo resolveInfo : resInfoList) {
+                            String packageName = resolveInfo.activityInfo.packageName;
+                            grantUriPermission(packageName, cameraImageUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        }
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception e) {
+                    cameraImageUri = null;
+                    currentPhotoFile = null;
+                }
 
                 Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
                 contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -229,19 +250,33 @@ public class MainActivity extends Activity {
 
                     // Save temporarily in cache
                     File cachePath = new File(getCacheDir(), "images");
-                    cachePath.mkdirs();
+                    if (!cachePath.exists()) {
+                        cachePath.mkdirs();
+                    }
                     File file = new File(cachePath, "cat_postcard.png");
                     FileOutputStream stream = new FileOutputStream(file);
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    stream.flush();
                     stream.close();
 
-                    Uri contentUri = Uri.fromFile(file);
+                    Uri contentUri = FileProvider.getUriForFile(
+                        MainActivity.this,
+                        getPackageName() + ".fileprovider",
+                        file
+                    );
 
                     Intent shareIntent = new Intent(Intent.ACTION_SEND);
                     shareIntent.setType("image/png");
                     shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
                     shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+                    shareIntent.setClipData(ClipData.newRawUri("", contentUri));
                     shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                    List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(shareIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                    for (ResolveInfo resolveInfo : resInfoList) {
+                        String packageName = resolveInfo.activityInfo.packageName;
+                        grantUriPermission(packageName, contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    }
 
                     startActivity(Intent.createChooser(shareIntent, "Поделиться открыткой с котиком"));
                 } catch (Exception e) {
@@ -256,6 +291,12 @@ public class MainActivity extends Activity {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "CAT_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        if (storageDir == null) {
+            storageDir = new File(getCacheDir(), "pictures");
+        }
+        if (!storageDir.exists()) {
+            storageDir.mkdirs();
+        }
         return File.createTempFile(imageFileName, ".jpg", storageDir);
     }
 
@@ -267,7 +308,7 @@ public class MainActivity extends Activity {
             Uri[] results = null;
             if (resultCode == Activity.RESULT_OK) {
                 if (data == null || data.getData() == null) {
-                    if (cameraImageUri != null) {
+                    if (cameraImageUri != null && currentPhotoFile != null && currentPhotoFile.exists() && currentPhotoFile.length() > 0) {
                         results = new Uri[]{cameraImageUri};
                     }
                 } else {

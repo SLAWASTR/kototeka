@@ -24,7 +24,7 @@ class KototekaApp {
       accuracy: null
     };
     this.currentViewingCatId = null;
-    this.username = localStorage.getItem('kototeka_username') || 'slawastr';
+    this.username = localStorage.getItem('kototeka_username') || 'Котолов';
   }
 
   async init() {
@@ -35,6 +35,11 @@ class KototekaApp {
     this.bindEvents();
     this.renderUsername();
     await this.loadCats();
+
+    // First-launch prompt for username
+    if (!localStorage.getItem('kototeka_username')) {
+      setTimeout(() => this.openWelcomeModal(), 400);
+    }
 
     // Register Service Worker for PWA
     if ('serviceWorker' in navigator) {
@@ -196,6 +201,16 @@ class KototekaApp {
         this.setTheme(isDark ? 'light' : 'dark');
       });
     }
+
+    // Welcome user form (first launch)
+    const welcomeForm = document.getElementById('welcomeUserForm');
+    if (welcomeForm) {
+      welcomeForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('welcomeUsernameInput');
+        this.saveWelcomeUsername(input ? input.value : '');
+      });
+    }
   }
 
   async loadCats() {
@@ -355,6 +370,13 @@ class KototekaApp {
       c.classList.toggle('selected', c.dataset.val === 'Ласковый');
     });
 
+    // Reset date detected notice
+    const notice = document.getElementById('catDateDetectedNotice');
+    if (notice) {
+      notice.textContent = '';
+      notice.style.display = 'none';
+    }
+
     const statusEl = document.getElementById('gpsStatusText');
     if (statusEl) statusEl.textContent = 'Нажмите «Определить где я», чтобы запросить координаты';
   }
@@ -372,6 +394,31 @@ class KototekaApp {
       previewImg.src = result.photo;
       previewImg.style.display = 'block';
       document.getElementById('photoUploaderContent').style.display = 'none';
+
+      // Auto-detect and set date if available from photo metadata (EXIF or file)
+      if (result.detectedDate) {
+        const d = result.detectedDate;
+        // Format to local YYYY-MM-DDTHH:mm
+        const localIso = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        const dateInput = document.getElementById('catDateInput');
+        if (dateInput) {
+          dateInput.value = localIso;
+        }
+
+        const notice = document.getElementById('catDateDetectedNotice');
+        if (notice) {
+          const readable = d.toLocaleString('ru-RU', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          const sourceText = result.detectedDateSource === 'exif' ? 'EXIF камеры' : 'метаданные файла';
+          notice.textContent = `📅 Дата определена по фото: ${readable} (${sourceText})`;
+          notice.style.display = 'block';
+        }
+      }
       
       if (!window.soundMuted) window.achievementManager.playMeowSound();
     } catch (err) {
@@ -791,14 +838,34 @@ class KototekaApp {
     }
   }
 
-  promptChangeUsername() {
-    const newName = prompt('Введите ваше имя котолова (будет отображаться в карточках и при отправке в Telegram):', this.username);
-    if (newName && newName.trim()) {
-      this.username = newName.trim();
-      localStorage.setItem('kototeka_username', this.username);
-      this.renderUsername();
-      alert(`Имя котолова изменено на: ${this.username}`);
+  openWelcomeModal() {
+    const modal = document.getElementById('welcomeUserModal');
+    if (modal) {
+      modal.classList.add('open');
+      const input = document.getElementById('welcomeUsernameInput');
+      if (input) {
+        input.value = (this.username && this.username !== 'Котолов') ? this.username : '';
+        setTimeout(() => input.focus(), 300);
+      }
     }
+  }
+
+  closeWelcomeModal() {
+    const modal = document.getElementById('welcomeUserModal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  saveWelcomeUsername(name) {
+    const clean = (name || '').trim();
+    this.username = clean || 'Котолов';
+    localStorage.setItem('kototeka_username', this.username);
+    this.renderUsername();
+    this.closeWelcomeModal();
+    if (!window.soundMuted) window.achievementManager.playMeowSound();
+  }
+
+  promptChangeUsername() {
+    this.openWelcomeModal();
   }
 
   shareToTelegram() {
@@ -829,7 +896,7 @@ class KototekaApp {
 
       // 2. Fallback to Telegram Web / App URL
       const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(text)}`;
-      window.location.href = tgUrl;
+      window.open(tgUrl, '_blank') || (window.location.href = tgUrl);
     } catch (e) {
       alert('Ошибка при отправке в Telegram: ' + e.message);
     }
@@ -1026,7 +1093,7 @@ class KototekaApp {
       window.AndroidBridge.shareToTelegram(text, appUrl);
     } else {
       const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(text)}`;
-      window.location.href = tgUrl;
+      window.open(tgUrl, '_blank') || (window.location.href = tgUrl);
     }
   }
 
