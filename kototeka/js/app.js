@@ -26,7 +26,10 @@ class KototekaApp {
     this.currentViewingCatId = null;
   }
 
-  async init() {
+    // Initialize Dark/Light Theme
+    const savedTheme = localStorage.getItem('kototeka_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    this.setTheme(savedTheme);
+
     this.bindEvents();
     await this.loadCats();
 
@@ -39,6 +42,16 @@ class KototekaApp {
 
     // Check achievements initially
     window.achievementManager.checkAll(this.cats);
+  }
+
+  setTheme(theme) {
+    const isDark = theme === 'dark';
+    document.body.classList.toggle('dark-mode', isDark);
+    localStorage.setItem('kototeka_theme', theme);
+    const themeBtn = document.getElementById('themeToggleBtn');
+    if (themeBtn) {
+      themeBtn.textContent = isDark ? '☀️' : '🌙';
+    }
   }
 
   bindEvents() {
@@ -169,6 +182,15 @@ class KototekaApp {
       soundBtn.addEventListener('click', () => {
         window.soundMuted = !window.soundMuted;
         soundBtn.textContent = window.soundMuted ? '🔇' : '🔊';
+      });
+    }
+
+    // Theme toggle
+    const themeBtn = document.getElementById('themeToggleBtn');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const isDark = document.body.classList.contains('dark-mode');
+        this.setTheme(isDark ? 'light' : 'dark');
       });
     }
   }
@@ -311,6 +333,14 @@ class KototekaApp {
     document.getElementById('previewPhotoImg').style.display = 'none';
     document.getElementById('photoUploaderContent').style.display = 'flex';
     document.getElementById('manualAddressInput').value = '';
+    
+    // Set date-time picker to now
+    const dateInput = document.getElementById('catDateInput');
+    if (dateInput) {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      dateInput.value = now.toISOString().slice(0, 16);
+    }
     
     // Reset chips to defaults
     this.selectedColor = 'Рыжий';
@@ -466,6 +496,9 @@ class KototekaApp {
       this.selectedLocation.address = manualAddr;
     }
 
+    const dateVal = document.getElementById('catDateInput') ? document.getElementById('catDateInput').value : '';
+    const createdAt = dateVal ? new Date(dateVal).toISOString() : new Date().toISOString();
+
     // Prepare cat object
     const cat = {
       id: 'cat_' + Date.now(),
@@ -477,7 +510,7 @@ class KototekaApp {
       tags: [this.selectedColor, this.selectedMood].filter(Boolean),
       notes: notes,
       location: { ...this.selectedLocation },
-      createdAt: new Date().toISOString()
+      createdAt: createdAt
     };
 
     try {
@@ -572,6 +605,35 @@ class KototekaApp {
       }
     } catch (e) {
       alert('Ошибка при удалении: ' + e.message);
+    }
+  }
+
+  async editCatDate() {
+    const cat = this.cats.find(c => c.id === this.currentViewingCatId);
+    if (!cat) return;
+    
+    const d = new Date(cat.createdAt);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    const currentFormatted = d.toISOString().slice(0, 16).replace('T', ' ');
+
+    const newDateStr = prompt('Введите новую дату и время встречи (ГГГГ-ММ-ДД ЧЧ:ММ):', currentFormatted);
+    if (!newDateStr) return;
+
+    const parsed = new Date(newDateStr.replace(' ', 'T'));
+    if (isNaN(parsed.getTime())) {
+      alert('Неверный формат даты. Пример: 2026-10-15 14:30');
+      return;
+    }
+
+    try {
+      cat.createdAt = parsed.toISOString();
+      await window.catDb.saveCat(cat);
+      this.openCatModal(cat.id);
+      this.renderGallery();
+      window.achievementManager.checkAll(this.cats);
+      alert('Дата котика успешно изменена!');
+    } catch (e) {
+      alert('Ошибка обновления даты: ' + e.message);
     }
   }
 

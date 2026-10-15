@@ -4,6 +4,7 @@
  */
 
 const ACHIEVEMENTS_DEF = [
+  // --- Количество котиков (Прогрессия сложности) ---
   {
     id: 'first_cat',
     icon: '🐾',
@@ -13,6 +14,97 @@ const ACHIEVEMENTS_DEF = [
     progress: (cats) => Math.min(cats.length, 1) + '/1'
   },
   {
+    id: 'cat_walker',
+    icon: '🚶',
+    title: 'Дворовый следопыт',
+    desc: 'Найдено 5 котиков на улицах города',
+    check: (cats) => cats.length >= 5,
+    progress: (cats) => Math.min(cats.length, 5) + '/5'
+  },
+  {
+    id: 'cat_baron',
+    icon: '👑',
+    title: 'Кошачий барон',
+    desc: 'Собрана коллекция из 10 котиков',
+    check: (cats) => cats.length >= 10,
+    progress: (cats) => Math.min(cats.length, 10) + '/10'
+  },
+  {
+    id: 'cat_master',
+    icon: '🏰',
+    title: 'Мастер котолова',
+    desc: 'Серьёзная коллекция из 25 пушистых друзей',
+    check: (cats) => cats.length >= 25,
+    progress: (cats) => Math.min(cats.length, 25) + '/25'
+  },
+  {
+    id: 'cat_legend',
+    icon: '🏆',
+    title: 'Легенда улиц',
+    desc: 'Целых 50 котиков в коллекции!',
+    check: (cats) => cats.length >= 50,
+    progress: (cats) => Math.min(cats.length, 50) + '/50'
+  },
+  {
+    id: 'cat_demigod',
+    icon: '🌌',
+    title: 'Кошачий полубог',
+    desc: 'Невероятные 100 котиков! Абсолютный рекорд!',
+    check: (cats) => cats.length >= 100,
+    progress: (cats) => Math.min(cats.length, 100) + '/100'
+  },
+
+  // --- Окрасы ---
+  {
+    id: 'ginger_squad',
+    icon: '🦊',
+    title: 'Рыжий легион',
+    desc: 'Найдено 5 рыжих котиков',
+    check: (cats) => cats.filter(c => (c.color === 'Рыжий' || (c.tags && c.tags.includes('Рыжий')))).length >= 5,
+    progress: (cats) => {
+      const count = cats.filter(c => (c.color === 'Рыжий' || (c.tags && c.tags.includes('Рыжий')))).length;
+      return Math.min(count, 5) + '/5';
+    }
+  },
+  {
+    id: 'black_panther',
+    icon: '🐈‍⬛',
+    title: 'Орден Чёрной пантеры',
+    desc: 'Собрано 5 угольно-чёрных котов',
+    check: (cats) => cats.filter(c => (c.color === 'Чёрный' || (c.tags && c.tags.includes('Чёрный')))).length >= 5,
+    progress: (cats) => {
+      const count = cats.filter(c => (c.color === 'Чёрный' || (c.tags && c.tags.includes('Чёрный')))).length;
+      return Math.min(count, 5) + '/5';
+    }
+  },
+  {
+    id: 'white_snow',
+    icon: '🤍',
+    title: 'Белоснежка',
+    desc: 'Найдено 3 чисто белых котика',
+    check: (cats) => cats.filter(c => (c.color === 'Белый' || (c.tags && c.tags.includes('Белый')))).length >= 3,
+    progress: (cats) => {
+      const count = cats.filter(c => (c.color === 'Белый' || (c.tags && c.tags.includes('Белый')))).length;
+      return Math.min(count, 3) + '/3';
+    }
+  },
+  {
+    id: 'cat_rainbow',
+    icon: '🌈',
+    title: 'Кошачья радуга',
+    desc: 'Собраны котики минимум 5 различных окрасов',
+    check: (cats) => {
+      const colors = new Set(cats.map(c => c.color).filter(Boolean));
+      return colors.size >= 5;
+    },
+    progress: (cats) => {
+      const colors = new Set(cats.map(c => c.color).filter(Boolean));
+      return Math.min(colors.size, 5) + '/5 окрасов';
+    }
+  },
+
+  // --- Геолокация и обход спуфинга ---
+  {
     id: 'anti_spoofing',
     icon: '🎯',
     title: 'Снайпер по карте',
@@ -21,93 +113,100 @@ const ACHIEVEMENTS_DEF = [
     progress: (cats) => (cats.some(c => c.location && c.location.type === 'manual') ? '1/1' : '0/1')
   },
   {
-    id: 'ginger_squad',
-    icon: '🦊',
-    title: 'Рыжая банда',
-    desc: 'Найдено 3 рыжих котика',
-    check: (cats) => cats.filter(c => (c.color === 'Рыжий' || (c.tags && c.tags.includes('Рыжий')))).length >= 3,
+    id: 'anti_spoofing_pro',
+    icon: '🛡️',
+    title: 'Гроза РЭБ',
+    desc: '5 котиков с ручной точной меткой на карте',
+    check: (cats) => cats.filter(c => c.location && c.location.type === 'manual').length >= 5,
     progress: (cats) => {
-      const count = cats.filter(c => (c.color === 'Рыжий' || (c.tags && c.tags.includes('Рыжий')))).length;
-      return Math.min(count, 3) + '/3';
+      const count = cats.filter(c => c.location && c.location.type === 'manual').length;
+      return Math.min(count, 5) + '/5';
     }
   },
   {
-    id: 'black_panther',
-    icon: '🐈‍⬛',
-    title: 'Чёрная пантера',
-    desc: 'Найден хотя бы один угольно-чёрный котик',
-    check: (cats) => cats.some(c => c.color === 'Чёрный' || (c.tags && c.tags.includes('Чёрный'))),
-    progress: (cats) => (cats.some(c => c.color === 'Чёрный' || (c.tags && c.tags.includes('Чёрный'))) ? '1/1' : '0/1')
+    id: 'urban_explorer',
+    icon: '🗺️',
+    title: 'Картограф-маньяк',
+    desc: 'Отмечены котики в 10 различных точках города',
+    check: (cats) => {
+      const withLoc = cats.filter(c => c.location && c.location.lat && c.location.lng);
+      return withLoc.length >= 10;
+    },
+    progress: (cats) => {
+      const withLoc = cats.filter(c => c.location && c.location.lat && c.location.lng);
+      return Math.min(withLoc.length, 10) + '/10';
+    }
   },
-  {
-    id: 'sleepy_cat',
-    icon: '💤',
-    title: 'Сонное царство',
-    desc: 'Замечен спящий котик',
-    check: (cats) => cats.some(c => c.mood === 'Спит' || (c.tags && c.tags.includes('Спит'))),
-    progress: (cats) => (cats.some(c => c.mood === 'Спит' || (c.tags && c.tags.includes('Спит'))) ? '1/1' : '0/1')
-  },
+
+  // --- Повадки и время ---
   {
     id: 'treat_master',
     icon: '🥐',
-    title: 'Сытый друг',
-    desc: 'В заметках упомянуто угощение (еда, сосиска, корм, лакомство)',
+    title: 'Главный кормилец',
+    desc: 'В 5 заметках упомянуто угощение (сосиска, корм, мясо, рыба)',
     check: (cats) => {
       const foodWords = ['еда', 'корм', 'сосис', 'колбас', 'мяс', 'рыб', 'угост', 'купил', 'лакомств', 'покорм'];
-      return cats.some(c => c.notes && foodWords.some(w => c.notes.toLowerCase().includes(w)));
+      const count = cats.filter(c => c.notes && foodWords.some(w => c.notes.toLowerCase().includes(w))).length;
+      return count >= 5;
     },
     progress: (cats) => {
       const foodWords = ['еда', 'корм', 'сосис', 'колбас', 'мяс', 'рыб', 'угост', 'купил', 'лакомств', 'покорм'];
-      const ok = cats.some(c => c.notes && foodWords.some(w => c.notes.toLowerCase().includes(w)));
-      return ok ? '1/1' : '0/1';
+      const count = cats.filter(c => c.notes && foodWords.some(w => c.notes.toLowerCase().includes(w))).length;
+      return Math.min(count, 5) + '/5';
     }
   },
   {
     id: 'night_watch',
     icon: '🌑',
     title: 'Ночной дозор',
-    desc: 'Кот сфотографирован в тёмное время суток (после 21:00 или до 06:00)',
-    check: (cats) => cats.some(c => {
-      const hour = new Date(c.createdAt).getHours();
-      return hour >= 21 || hour < 6;
-    }),
-    progress: (cats) => {
-      const ok = cats.some(c => {
+    desc: '3 котика сфотографированы ночью (с 21:00 до 06:00)',
+    check: (cats) => {
+      const nightCount = cats.filter(c => {
         const hour = new Date(c.createdAt).getHours();
         return hour >= 21 || hour < 6;
-      });
-      return ok ? '1/1' : '0/1';
-    }
-  },
-  {
-    id: 'urban_explorer',
-    icon: '🗺️',
-    title: 'Городской следопыт',
-    desc: 'Отмечены котики в 3 различных локациях',
-    check: (cats) => {
-      const withLoc = cats.filter(c => c.location && c.location.lat && c.location.lng);
-      return withLoc.length >= 3;
+      }).length;
+      return nightCount >= 3;
     },
     progress: (cats) => {
-      const withLoc = cats.filter(c => c.location && c.location.lat && c.location.lng);
-      return Math.min(withLoc.length, 3) + '/3';
+      const nightCount = cats.filter(c => {
+        const hour = new Date(c.createdAt).getHours();
+        return hour >= 21 || hour < 6;
+      }).length;
+      return Math.min(nightCount, 3) + '/3';
     }
   },
   {
-    id: 'cat_baron',
-    icon: '👑',
-    title: 'Кошачий барон',
-    desc: 'Собрана солидная коллекция из 10 котиков',
-    check: (cats) => cats.length >= 10,
-    progress: (cats) => Math.min(cats.length, 10) + '/10'
+    id: 'sleepy_cat',
+    icon: '💤',
+    title: 'Сонное царство',
+    desc: 'Найдено 5 спящих котиков',
+    check: (cats) => cats.filter(c => c.mood === 'Спит' || (c.tags && c.tags.includes('Спит'))).length >= 5,
+    progress: (cats) => {
+      const count = cats.filter(c => c.mood === 'Спит' || (c.tags && c.tags.includes('Спит'))).length;
+      return Math.min(count, 5) + '/5';
+    }
   },
   {
-    id: 'cat_legend',
-    icon: '🏆',
-    title: 'Легенда дворов',
-    desc: 'Целых 25 котиков в коллекции!',
-    check: (cats) => cats.length >= 25,
-    progress: (cats) => Math.min(cats.length, 25) + '/25'
+    id: 'bandit_patrol',
+    icon: '😎',
+    title: 'Бандитский район',
+    desc: '3 дерзких кота с характером «Бандит»',
+    check: (cats) => cats.filter(c => c.mood === 'Бандит' || (c.tags && c.tags.includes('Бандит'))).length >= 3,
+    progress: (cats) => {
+      const count = cats.filter(c => c.mood === 'Бандит' || (c.tags && c.tags.includes('Бандит'))).length;
+      return Math.min(count, 3) + '/3';
+    }
+  },
+  {
+    id: 'affection_overload',
+    icon: '💖',
+    title: 'Мурчащий клубок',
+    desc: '5 ласковых или мурчащих котиков',
+    check: (cats) => cats.filter(c => c.mood === 'Ласковый' || c.mood === 'Мурчит').length >= 5,
+    progress: (cats) => {
+      const count = cats.filter(c => c.mood === 'Ласковый' || c.mood === 'Мурчит').length;
+      return Math.min(count, 5) + '/5';
+    }
   }
 ];
 
@@ -152,7 +251,6 @@ class AchievementManager {
   triggerNotification(ach) {
     this.playCelebrationSound();
 
-    // Show floating toast
     const toast = document.createElement('div');
     toast.className = 'achievement-toast animate-bounce-in';
     toast.innerHTML = `
@@ -179,7 +277,6 @@ class AchievementManager {
       if (!AudioContext) return;
       const ctx = new AudioContext();
 
-      // Play cute harmonious arpeggio chime (C5 - E5 - G5 - C6)
       const notes = [523.25, 659.25, 783.99, 1046.50];
       notes.forEach((freq, index) => {
         const osc = ctx.createOscillator();
@@ -197,9 +294,7 @@ class AchievementManager {
         osc.start(startTime);
         osc.stop(startTime + 0.36);
       });
-    } catch (e) {
-      // Audio autoplay might be muted
-    }
+    } catch (e) {}
   }
 
   playMeowSound() {
@@ -208,7 +303,6 @@ class AchievementManager {
       if (!AudioContext) return;
       const ctx = new AudioContext();
 
-      // Synthesize a cute playful "meow" pitch curve
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';

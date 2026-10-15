@@ -1194,3 +1194,137 @@ body {
 .animate-pop {
   animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
+/* ==========================================================================
+   Dark Mode Theme Overrides
+   ========================================================================== */
+
+body.dark-mode {
+  --bg-main: #0b1120;
+  --bg-card: #1e293b;
+  --bg-surface: #334155;
+  
+  --text-main: #f8fafc;
+  --text-muted: #cbd5e1;
+  --text-subtle: #94a3b8;
+  
+  --border-light: #334155;
+  --border-card: #334155;
+  
+  --primary-light: rgba(234, 88, 12, 0.22);
+}
+
+body.dark-mode .app-header {
+  background: rgba(11, 17, 32, 0.94);
+  border-bottom-color: #334155;
+}
+
+body.dark-mode .bottom-nav {
+  background: rgba(11, 17, 32, 0.95);
+  border-top-color: #334155;
+}
+
+body.dark-mode .modal-sheet {
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+body.dark-mode .form-input,
+body.dark-mode .form-textarea,
+body.dark-mode .search-input {
+  background: #0f172a;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+body.dark-mode .filter-chip {
+  background: #1e293b;
+  color: #cbd5e1;
+  border-color: #334155;
+}
+
+body.dark-mode .tag-select-chip {
+  background: #0f172a;
+  color: #cbd5e1;
+  border-color: #334155;
+}
+
+body.dark-mode .geo-section {
+  background: #1e293b;
+  border-color: #475569;
+}
+
+body.dark-mode .geo-mode-switcher {
+  background: #0f172a;
+}
+
+body.dark-mode .geo-mode-btn.active {
+  background: #334155;
+  color: #f97316;
+}
+
+body.dark-mode .geo-notice-banner {
+  background: #292524;
+  border-color: #78350f;
+  color: #fde68a;
+}
+
+body.dark-mode .ach-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+body.dark-mode .ach-card.locked {
+  background: #0f172a;
+}
+
+body.dark-mode .achievements-summary-card {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border-color: #ea580c55;
+}
+
+body.dark-mode .photo-uploader-box {
+  background: #0f172a;
+  border-color: #ea580c77;
+}
+
+body.dark-mode .empty-state {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+body.dark-mode .icon-button {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+body.dark-mode .cat-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+body.dark-mode .cat-bubble-popup .leaflet-popup-content-wrapper {
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+body.dark-mode .popup-name {
+  color: #f8fafc;
+}
+
+body.dark-mode .map-floating-bar {
+  background: rgba(30, 41, 59, 0.94);
+  border-color: #334155;
+}
+
+body.dark-mode .map-stat-text {
+  color: #f8fafc;
+}
+
+body.dark-mode .achievement-toast {
+  background: rgba(30, 41, 59, 0.96);
+  border-color: #ea580c;
+  color: #f8fafc;
+}
+

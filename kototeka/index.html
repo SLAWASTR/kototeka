@@ -29,10 +29,11 @@
       <img src="./icons/cat-icon.svg" alt="Кототека" class="brand-icon">
       <div>
         <div class="brand-title">Кототека 🐾</div>
-        <div class="brand-subtitle">Охота на городских котиков</div>
+        <div class="brand-subtitle">Создано slawastr • Охота на котиков</div>
       </div>
     </div>
     <div class="header-actions">
+      <button id="themeToggleBtn" class="icon-button" title="Тёмная/светлая тема">🌙</button>
       <button id="soundToggleBtn" class="icon-button" title="Звуки">🔊</button>
       <button id="exportBackupBtn" class="icon-button" title="Резервная копия (Экспорт)">💾</button>
       <label for="importBackupInput" class="icon-button" title="Восстановить из файла" style="cursor:pointer;">📂</label>
@@ -114,6 +115,9 @@
       </div>
     </div>
     <div id="achievementsList" class="achievements-list"></div>
+    <div style="text-align:center; padding:24px 0 12px 0; font-size:0.82rem; color:var(--text-subtle);">
+      🐾 «Кототека» создана <b>slawastr</b> • С любовью к уличным котикам
+    </div>
   </section>
 
   <!-- Bottom Navigation Bar -->
@@ -179,6 +183,12 @@
         <div class="form-group">
           <label class="form-label" for="catNameInput"><span>🐾</span> Кличка / Описание</label>
           <input type="text" id="catNameInput" class="form-input" placeholder="Например: Барсик у булочной, Рыжий хулиган..." required>
+        </div>
+
+        <!-- Date & Time Input -->
+        <div class="form-group">
+          <label class="form-label" for="catDateInput"><span>📅</span> Дата и время встречи</label>
+          <input type="datetime-local" id="catDateInput" class="form-input" required>
         </div>
 
         <!-- Color Selector Chips -->
@@ -292,7 +302,10 @@
       <img id="detailCatPhoto" class="cat-detail-hero" src="" alt="Фото кота">
 
       <div style="display:flex; flex-direction:column; gap:10px;">
-        <div id="detailCatDate" style="font-size:0.8rem; color:var(--text-subtle);"></div>
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+          <div id="detailCatDate" style="font-size:0.82rem; color:var(--text-subtle);"></div>
+          <button type="button" class="btn-secondary" style="padding:3px 9px; font-size:0.75rem;" onclick="window.app.editCatDate()">📅 Изменить дату</button>
+        </div>
         <div id="detailCatLocation" style="font-size:0.92rem; font-weight:600; color:var(--text-main); display:flex; align-items:center; flex-wrap:wrap;"></div>
         
         <div id="detailCatTags" class="cat-card-tags"></div>
