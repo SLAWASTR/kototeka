@@ -336,6 +336,29 @@
     </div>
   </div>
 
+  <!-- =========================================================================
+       MODAL: Открытка с котиком (Предпросмотр и сохранение)
+       ========================================================================= -->
+  <div id="postcardModal" class="modal-overlay">
+    <div class="modal-sheet" style="max-width:440px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><span>🖼️</span> Открытка котика</h3>
+        <button type="button" class="modal-close-btn" onclick="document.getElementById('postcardModal').classList.remove('open')">✕</button>
+      </div>
+
+      <img id="postcardPreviewImg" style="width:100%; border-radius:14px; box-shadow:0 4px 14px rgba(0,0,0,0.15); margin-top:6px;" alt="Открытка с котиком">
+
+      <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+        <button type="button" class="btn-primary" onclick="window.app.savePostcardToDevice()">
+          <span>💾</span> Сохранить открытку в Галерею
+        </button>
+        <button type="button" class="btn-secondary" style="justify-content:center; padding:10px 14px;" onclick="window.app.sharePostcardToTelegram()">
+          <span>✈️</span> Отправить в Telegram
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Container for Achievements and Alerts -->
   <div id="toastContainer"></div>
 

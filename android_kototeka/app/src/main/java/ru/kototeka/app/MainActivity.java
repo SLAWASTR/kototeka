@@ -2,14 +2,19 @@ package ru.kototeka.app;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.webkit.GeolocationPermissions;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -20,10 +25,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,7 +71,41 @@ public class MainActivity extends Activity {
         settings.setUseWideViewPort(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
 
-        webView.setWebViewClient(new WebViewClient());
+        // Bridge for native Android Telegram share and saving images to gallery
+        webView.addJavascriptInterface(new WebAppInterface(), "AndroidBridge");
+
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url == null) return false;
+
+                // Handle Telegram, external web and maps links
+                if (url.startsWith("https://t.me/") || url.startsWith("http://t.me/") || 
+                    url.startsWith("tg:") || url.startsWith("intent:")) {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        startActivity(intent);
+                        return true;
+                    } catch (Exception e) {
+                        Toast.makeText(MainActivity.this, "Не удалось открыть Telegram", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                }
+
+                // External links like GitHub releases or Yandex Maps
+                if (url.startsWith("http://") || url.startsWith("https://")) {
+                    if (!url.contains("android_asset")) {
+                        try {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            startActivity(intent);
+                            return true;
+                        } catch (Exception ignored) {}
+                    }
+                }
+
+                return false;
+            }
+        });
 
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -88,9 +128,7 @@ public class MainActivity extends Activity {
                         takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri);
                     }
-                } catch (Exception e) {
-                    // Fallback to gallery only
-                }
+                } catch (Exception ignored) {}
 
                 Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
                 contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -107,6 +145,111 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
+    }
+
+    public class WebAppInterface {
+
+        @JavascriptInterface
+        public void shareToTelegram(final String text, final String url) {
+            runOnUiThread(() -> {
+                try {
+                    String fullUrl = "https://t.me/share/url?url=" + Uri.encode(url) + "&text=" + Uri.encode(text);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(fullUrl));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                } catch (Exception e) {
+                    // Fallback to standard Android share chooser
+                    try {
+                        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, text + "\n" + url);
+                        sendIntent.setType("text/plain");
+                        startActivity(Intent.createChooser(sendIntent, "Поделиться котиком"));
+                    } catch (Exception ex) {
+                        Toast.makeText(MainActivity.this, "Ошибка при отправке", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void saveBase64Image(final String base64Data, final String filename) {
+            runOnUiThread(() -> {
+                try {
+                    String cleanData = base64Data;
+                    if (cleanData.contains(",")) {
+                        cleanData = cleanData.substring(cleanData.indexOf(",") + 1);
+                    }
+                    byte[] imageBytes = Base64.decode(cleanData, Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+
+                    String name = (filename != null && !filename.isEmpty()) ? filename : ("Kototeka_" + System.currentTimeMillis() + ".png");
+
+                    OutputStream fos = null;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+                        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+                        contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Кототека");
+                        Uri imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+                        if (imageUri != null) {
+                            fos = getContentResolver().openOutputStream(imageUri);
+                        }
+                    } else {
+                        File imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                        File kototekaDir = new File(imagesDir, "Кототека");
+                        if (!kototekaDir.exists()) kototekaDir.mkdirs();
+                        File imageFile = new File(kototekaDir, name);
+                        fos = new FileOutputStream(imageFile);
+                    }
+
+                    if (fos != null) {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                        fos.flush();
+                        fos.close();
+                        Toast.makeText(MainActivity.this, "🐾 Открытка сохранена в Галерею (альбом «Кототека»)!", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Не удалось сохранить открытку", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Ошибка сохранения: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void shareImage(final String base64Data, final String text) {
+            runOnUiThread(() -> {
+                try {
+                    String cleanData = base64Data;
+                    if (cleanData.contains(",")) {
+                        cleanData = cleanData.substring(cleanData.indexOf(",") + 1);
+                    }
+                    byte[] imageBytes = Base64.decode(cleanData, Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+
+                    // Save temporarily in cache
+                    File cachePath = new File(getCacheDir(), "images");
+                    cachePath.mkdirs();
+                    File file = new File(cachePath, "cat_postcard.png");
+                    FileOutputStream stream = new FileOutputStream(file);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    stream.close();
+
+                    Uri contentUri = Uri.fromFile(file);
+
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("image/png");
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                    startActivity(Intent.createChooser(shareIntent, "Поделиться открыткой с котиком"));
+                } catch (Exception e) {
+                    // Fallback to text share
+                    shareToTelegram(text, "https://github.com/SLAWASTR/kototeka/releases/tag/v1.0.0");
+                }
+            });
+        }
     }
 
     private File createImageFile() throws IOException {

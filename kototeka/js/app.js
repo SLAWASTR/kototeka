@@ -802,160 +802,231 @@ class KototekaApp {
   }
 
   shareToTelegram() {
-    const cat = this.cats.find(c => c.id === this.currentViewingCatId);
-    if (!cat) return;
+    try {
+      const cat = this.cats.find(c => c.id === this.currentViewingCatId);
+      if (!cat) return;
 
-    const appUrl = 'https://github.com/SLAWASTR/kototeka/releases/tag/v1.0.0';
-    const dateStr = new Date(cat.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-    const locStr = cat.location ? (cat.location.address || `${cat.location.lat}, ${cat.location.lng}`) : 'Городские улицы';
-    const noteText = cat.notes ? `\n📝 Заметка: «${cat.notes}»` : '';
+      const appUrl = 'https://github.com/SLAWASTR/kototeka/releases/tag/v1.0.0';
+      const dateStr = new Date(cat.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+      const locStr = cat.location ? (cat.location.address || `${cat.location.lat}, ${cat.location.lng}`) : 'Городские улицы';
+      const noteText = cat.notes ? `\n📝 Заметка: «${cat.notes}»` : '';
 
-    const text = 
-      `🐾 Я встретил котика и добавил в свою «Кототеку»!\n\n` +
-      `🐱 Кличка: ${cat.name}\n` +
-      `🎨 Окрас: ${cat.color || 'Особенный'} | Настроение: ${cat.mood || 'Милый'}\n` +
-      `📍 Где: ${locStr}\n` +
-      `📅 Дата: ${dateStr}` +
-      noteText + `\n` +
-      `👤 Котолов: ${this.username}\n\n` +
-      `📲 Скачивай приложение «Кототека» на Android и собирай котиков:`;
+      const text = 
+        `🐾 Я встретил котика и добавил в свою «Кототеку»!\n\n` +
+        `🐱 Кличка: ${cat.name}\n` +
+        `🎨 Окрас: ${cat.color || 'Особенный'} | Настроение: ${cat.mood || 'Милый'}\n` +
+        `📍 Где: ${locStr}\n` +
+        `📅 Дата: ${dateStr}` +
+        noteText + `\n` +
+        `👤 Котолов: ${this.username}\n\n` +
+        `📲 Скачивай приложение «Кототека» на Android и собирай котиков:`;
 
-    const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(text)}`;
-    window.open(tgUrl, '_blank');
+      // 1. If in native Android APK container
+      if (window.AndroidBridge && window.AndroidBridge.shareToTelegram) {
+        window.AndroidBridge.shareToTelegram(text, appUrl);
+        return;
+      }
+
+      // 2. Fallback to Telegram Web / App URL
+      const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(text)}`;
+      window.location.href = tgUrl;
+    } catch (e) {
+      alert('Ошибка при отправке в Telegram: ' + e.message);
+    }
   }
 
   async downloadCatCard() {
     const cat = this.cats.find(c => c.id === this.currentViewingCatId);
     if (!cat) return;
 
-    // Create high-res canvas (1000x1200)
-    const canvas = document.createElement('canvas');
-    canvas.width = 1000;
-    canvas.height = 1200;
-    const ctx = canvas.getContext('2d');
+    try {
+      // Create high-res canvas (1000x1200)
+      const canvas = document.createElement('canvas');
+      canvas.width = 1000;
+      canvas.height = 1200;
+      const ctx = canvas.getContext('2d');
 
-    const isDark = document.body.classList.contains('dark-mode');
-    const bgGradient = ctx.createLinearGradient(0, 0, 0, 1200);
-    if (isDark) {
-      bgGradient.addColorStop(0, '#1e293b');
-      bgGradient.addColorStop(1, '#0f172a');
-    } else {
-      bgGradient.addColorStop(0, '#fff7ed');
-      bgGradient.addColorStop(1, '#ffedd5');
-    }
-    ctx.fillStyle = bgGradient;
-    ctx.fillRect(0, 0, 1000, 1200);
-
-    // Decorative border
-    ctx.strokeStyle = '#ea580c';
-    ctx.lineWidth = 10;
-    ctx.strokeRect(20, 20, 960, 1160);
-
-    // Header badge
-    ctx.fillStyle = '#ea580c';
-    ctx.font = 'bold 36px -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('🐾 КОТОТЕКА • КАРТОЧКА КОТИКА', 500, 80);
-
-    ctx.fillStyle = isDark ? '#cbd5e1' : '#64748b';
-    ctx.font = '24px -apple-system, sans-serif';
-    ctx.fillText(`Котолов: ${this.username}`, 500, 120);
-
-    // Draw Photo Box
-    const drawContent = () => {
-      // Cat name
-      ctx.fillStyle = isDark ? '#ffffff' : '#1e293b';
-      ctx.font = 'bold 50px -apple-system, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(cat.name, 500, 800);
-
-      // Meta info (Date & Location)
-      const dateStr = new Date(cat.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-      const locStr = cat.location ? (cat.location.address || `${cat.location.lat}, ${cat.location.lng}`) : 'Городские улицы';
-      
-      ctx.fillStyle = isDark ? '#94a3b8' : '#475569';
-      ctx.font = '28px -apple-system, sans-serif';
-      ctx.fillText(`📅 ${dateStr}`, 500, 850);
-      ctx.fillText(`📍 ${locStr.slice(0, 48)}`, 500, 895);
-
-      // Tag pills
-      const tagText = `[ ${cat.color || 'Кот'} ]  [ ${cat.mood || 'Ласковый'} ]`;
-      ctx.fillStyle = '#ea580c';
-      ctx.font = 'bold 30px -apple-system, sans-serif';
-      ctx.fillText(tagText, 500, 950);
-
-      // Notes
-      if (cat.notes) {
-        ctx.fillStyle = isDark ? '#e2e8f0' : '#334155';
-        ctx.font = 'italic 26px -apple-system, sans-serif';
-        const noteExcerpt = cat.notes.length > 70 ? cat.notes.slice(0, 67) + '...' : cat.notes;
-        ctx.fillText(`«${noteExcerpt}»`, 500, 1020);
+      const isDark = document.body.classList.contains('dark-mode');
+      const bgGradient = ctx.createLinearGradient(0, 0, 0, 1200);
+      if (isDark) {
+        bgGradient.addColorStop(0, '#1e293b');
+        bgGradient.addColorStop(1, '#0f172a');
+      } else {
+        bgGradient.addColorStop(0, '#fff7ed');
+        bgGradient.addColorStop(1, '#ffedd5');
       }
+      ctx.fillStyle = bgGradient;
+      ctx.fillRect(0, 0, 1000, 1200);
 
-      // Footer
-      ctx.fillStyle = isDark ? '#64748b' : '#94a3b8';
-      ctx.font = '22px -apple-system, sans-serif';
-      ctx.fillText('Приложение «Кототека» • Скачать на Android: github.com/SLAWASTR/kototeka', 500, 1130);
+      // Decorative border
+      ctx.strokeStyle = '#ea580c';
+      ctx.lineWidth = 10;
+      ctx.strokeRect(20, 20, 960, 1160);
 
-      // Download
-      const dataUrl = canvas.toDataURL('image/png');
-      const a = document.createElement('a');
-      a.href = dataUrl;
-      const cleanName = cat.name.replace(/[^a-zA-Zа-яА-Я0-9]/g, '_');
-      a.download = `Кот_${cleanName}.png`;
-      a.click();
-    };
-
-    if (cat.photo) {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        // Draw photo with rounded clipping inside canvas
-        ctx.save();
-        ctx.beginPath();
-        // Rounded rectangle for photo (x: 100, y: 150, w: 800, h: 580, r: 24)
-        const rx = 100, ry = 150, rw = 800, rh = 580, rad = 24;
-        ctx.moveTo(rx + rad, ry);
-        ctx.lineTo(rx + rw - rad, ry);
-        ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + rad);
-        ctx.lineTo(rx + rw, ry + rh - rad);
-        ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - rad, ry + rh);
-        ctx.lineTo(rx + rad, ry + rh);
-        ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - rad);
-        ctx.lineTo(rx, ry + rad);
-        ctx.quadraticCurveTo(rx, ry, rx + rad, ry);
-        ctx.closePath();
-        ctx.clip();
-
-        // Fit image
-        const imgRatio = img.width / img.height;
-        const boxRatio = rw / rh;
-        let dw, dh, dx, dy;
-        if (imgRatio > boxRatio) {
-          dh = rh;
-          dw = rh * imgRatio;
-          dx = rx - (dw - rw) / 2;
-          dy = ry;
-        } else {
-          dw = rw;
-          dh = rw / imgRatio;
-          dx = rx;
-          dy = ry - (dh - rh) / 2;
-        }
-        ctx.drawImage(img, dx, dy, dw, dh);
-        ctx.restore();
-
-        drawContent();
-      };
-      img.src = cat.photo;
-    } else {
-      // Placeholder with huge paw
-      ctx.fillStyle = '#fed7aa';
-      ctx.fillRect(100, 150, 800, 580);
-      ctx.font = '160px sans-serif';
+      // Header badge
+      ctx.fillStyle = '#ea580c';
+      ctx.font = 'bold 36px -apple-system, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('🐾', 500, 480);
-      drawContent();
+      ctx.fillText('🐾 КОТОТЕКА • КАРТОЧКА КОТИКА', 500, 80);
+
+      ctx.fillStyle = isDark ? '#cbd5e1' : '#64748b';
+      ctx.font = '24px -apple-system, sans-serif';
+      ctx.fillText(`Котолов: ${this.username}`, 500, 120);
+
+      const drawContent = () => {
+        // Cat name
+        ctx.fillStyle = isDark ? '#ffffff' : '#1e293b';
+        ctx.font = 'bold 50px -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(cat.name, 500, 800);
+
+        // Meta info (Date & Location)
+        const dateStr = new Date(cat.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+        const locStr = cat.location ? (cat.location.address || `${cat.location.lat}, ${cat.location.lng}`) : 'Городские улицы';
+        
+        ctx.fillStyle = isDark ? '#94a3b8' : '#475569';
+        ctx.font = '28px -apple-system, sans-serif';
+        ctx.fillText(`📅 ${dateStr}`, 500, 850);
+        ctx.fillText(`📍 ${locStr.slice(0, 48)}`, 500, 895);
+
+        // Tag pills
+        const tagText = `[ ${cat.color || 'Кот'} ]  [ ${cat.mood || 'Ласковый'} ]`;
+        ctx.fillStyle = '#ea580c';
+        ctx.font = 'bold 30px -apple-system, sans-serif';
+        ctx.fillText(tagText, 500, 950);
+
+        // Notes
+        if (cat.notes) {
+          ctx.fillStyle = isDark ? '#e2e8f0' : '#334155';
+          ctx.font = 'italic 26px -apple-system, sans-serif';
+          const noteExcerpt = cat.notes.length > 70 ? cat.notes.slice(0, 67) + '...' : cat.notes;
+          ctx.fillText(`«${noteExcerpt}»`, 500, 1020);
+        }
+
+        // Footer
+        ctx.fillStyle = isDark ? '#64748b' : '#94a3b8';
+        ctx.font = '22px -apple-system, sans-serif';
+        ctx.fillText('Приложение «Кототека» • Скачать на Android: github.com/SLAWASTR/kototeka', 500, 1130);
+
+        const dataUrl = canvas.toDataURL('image/png');
+        this.currentPostcardDataUrl = dataUrl;
+        this.currentPostcardCat = cat;
+
+        // Display in postcard preview modal
+        const previewModal = document.getElementById('postcardModal');
+        const previewImg = document.getElementById('postcardPreviewImg');
+        if (previewModal && previewImg) {
+          previewImg.src = dataUrl;
+          previewModal.classList.add('open');
+        }
+
+        // If in Android app with native bridge, automatically save to gallery
+        if (window.AndroidBridge && window.AndroidBridge.saveBase64Image) {
+          const cleanName = cat.name.replace(/[^a-zA-Zа-яА-Я0-9]/g, '_');
+          window.AndroidBridge.saveBase64Image(dataUrl, `Кот_${cleanName}.png`);
+        }
+      };
+
+      if (cat.photo) {
+        const img = new Image();
+        if (cat.photo.startsWith('http')) {
+          img.crossOrigin = 'anonymous';
+        }
+        img.onload = () => {
+          ctx.save();
+          ctx.beginPath();
+          const rx = 100, ry = 150, rw = 800, rh = 580, rad = 24;
+          ctx.moveTo(rx + rad, ry);
+          ctx.lineTo(rx + rw - rad, ry);
+          ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + rad);
+          ctx.lineTo(rx + rw, ry + rh - rad);
+          ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - rad, ry + rh);
+          ctx.lineTo(rx + rad, ry + rh);
+          ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - rad);
+          ctx.lineTo(rx, ry + rad);
+          ctx.quadraticCurveTo(rx, ry, rx + rad, ry);
+          ctx.closePath();
+          ctx.clip();
+
+          const imgRatio = img.width / img.height;
+          const boxRatio = rw / rh;
+          let dw, dh, dx, dy;
+          if (imgRatio > boxRatio) {
+            dh = rh;
+            dw = rh * imgRatio;
+            dx = rx - (dw - rw) / 2;
+            dy = ry;
+          } else {
+            dw = rw;
+            dh = rw / imgRatio;
+            dx = rx;
+            dy = ry - (dh - rh) / 2;
+          }
+          ctx.drawImage(img, dx, dy, dw, dh);
+          ctx.restore();
+          drawContent();
+        };
+        img.onerror = () => {
+          drawContent();
+        };
+        img.src = cat.photo;
+      } else {
+        ctx.fillStyle = '#fed7aa';
+        ctx.fillRect(100, 150, 800, 580);
+        ctx.font = '160px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🐾', 500, 480);
+        drawContent();
+      }
+    } catch (err) {
+      alert('Ошибка при создании открытки: ' + err.message);
+    }
+  }
+
+  savePostcardToDevice() {
+    if (!this.currentPostcardDataUrl) return;
+    const cat = this.currentPostcardCat;
+    const cleanName = cat ? cat.name.replace(/[^a-zA-Zа-яА-Я0-9]/g, '_') : 'kot';
+    const filename = `Кот_${cleanName}.png`;
+
+    if (window.AndroidBridge && window.AndroidBridge.saveBase64Image) {
+      window.AndroidBridge.saveBase64Image(this.currentPostcardDataUrl, filename);
+    } else {
+      const a = document.createElement('a');
+      a.href = this.currentPostcardDataUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      alert('Открытка сохранена!');
+    }
+  }
+
+  sharePostcardToTelegram() {
+    if (!this.currentPostcardDataUrl) return;
+    const cat = this.currentPostcardCat;
+    const appUrl = 'https://github.com/SLAWASTR/kototeka/releases/tag/v1.0.0';
+    const dateStr = cat ? new Date(cat.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+    const locStr = cat && cat.location ? (cat.location.address || `${cat.location.lat}, ${cat.location.lng}`) : 'Городские улицы';
+    const noteText = cat && cat.notes ? `\n📝 Заметка: «${cat.notes}»` : '';
+
+    const text = 
+      `🐾 Я встретил котика и добавил в свою «Кототеку»!\n\n` +
+      `🐱 Кличка: ${cat ? cat.name : 'Котик'}\n` +
+      `🎨 Окрас: ${cat ? (cat.color || 'Особенный') : ''} | Настроение: ${cat ? (cat.mood || 'Милый') : ''}\n` +
+      `📍 Где: ${locStr}\n` +
+      `📅 Дата: ${dateStr}` +
+      noteText + `\n` +
+      `👤 Котолов: ${this.username}\n\n` +
+      `📲 Скачивай приложение «Кототека» на Android и собирай котиков:`;
+
+    if (window.AndroidBridge && window.AndroidBridge.shareImage) {
+      window.AndroidBridge.shareImage(this.currentPostcardDataUrl, text + '\n' + appUrl);
+    } else if (window.AndroidBridge && window.AndroidBridge.shareToTelegram) {
+      window.AndroidBridge.shareToTelegram(text, appUrl);
+    } else {
+      const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(text)}`;
+      window.location.href = tgUrl;
     }
   }
 
