@@ -377,6 +377,13 @@ class KototekaApp {
       notice.style.display = 'none';
     }
 
+    // Reset GPS detected notice
+    const gpsNotice = document.getElementById('catGpsDetectedNotice');
+    if (gpsNotice) {
+      gpsNotice.textContent = '';
+      gpsNotice.style.display = 'none';
+    }
+
     const statusEl = document.getElementById('gpsStatusText');
     if (statusEl) statusEl.textContent = 'Нажмите «Определить где я», чтобы запросить координаты';
   }
@@ -395,7 +402,7 @@ class KototekaApp {
       previewImg.style.display = 'block';
       document.getElementById('photoUploaderContent').style.display = 'none';
 
-      // Auto-detect and set date if available from photo metadata (EXIF or file)
+      // 1. Auto-detect and set date if available from photo metadata (EXIF or file)
       if (result.detectedDate) {
         const d = result.detectedDate;
         // Format to local YYYY-MM-DDTHH:mm
@@ -417,6 +424,37 @@ class KototekaApp {
           const sourceText = result.detectedDateSource === 'exif' ? 'EXIF камеры' : 'метаданные файла';
           notice.textContent = `📅 Дата определена по фото: ${readable} (${sourceText})`;
           notice.style.display = 'block';
+        }
+      }
+
+      // 2. Auto-detect and set Geolocation if available in photo EXIF
+      if (result.detectedGps) {
+        const { lat, lng } = result.detectedGps;
+        this.selectedLocation.lat = lat;
+        this.selectedLocation.lng = lng;
+        this.selectedLocation.type = 'manual';
+
+        // Switch to manual map mode to display marker at exact photo spot
+        this.setGeoMode('manual');
+
+        if (window.kototekaMap) {
+          window.kototekaMap.setPickerLocation(lat, lng, 'manual');
+        }
+
+        // Reverse-geocode to human-readable street/city
+        const geoInfo = await window.kototekaMap.reverseGeocode(lat, lng);
+        if (geoInfo && geoInfo.address) {
+          this.selectedLocation.address = geoInfo.address;
+          this.selectedLocation.district = geoInfo.district || '';
+          const addrInput = document.getElementById('manualAddressInput');
+          if (addrInput) addrInput.value = geoInfo.address;
+        }
+
+        const gpsNotice = document.getElementById('catGpsDetectedNotice');
+        if (gpsNotice) {
+          const locText = this.selectedLocation.address || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+          gpsNotice.innerHTML = `📍 Геолокация найдена в метаданных фото: <b>${this.escapeHtml(locText)}</b>`;
+          gpsNotice.style.display = 'block';
         }
       }
       
@@ -868,7 +906,7 @@ class KototekaApp {
     this.openWelcomeModal();
   }
 
-  shareToTelegram() {
+  async shareToTelegram() {
     try {
       const cat = this.cats.find(c => c.id === this.currentViewingCatId);
       if (!cat) return;
@@ -888,13 +926,40 @@ class KototekaApp {
         `👤 Котолов: ${this.username}\n\n` +
         `📲 Скачивай приложение «Кототека» на Android и собирай котиков:`;
 
-      // 1. If in native Android APK container
-      if (window.AndroidBridge && window.AndroidBridge.shareToTelegram) {
-        window.AndroidBridge.shareToTelegram(text, appUrl);
-        return;
+      const photoToShare = cat.photo || cat.thumb;
+
+      // 1. If in native Android APK container, attach image directly to Telegram
+      if (window.AndroidBridge) {
+        if (photoToShare && window.AndroidBridge.shareImageToTelegram) {
+          window.AndroidBridge.shareImageToTelegram(photoToShare, text, appUrl);
+          return;
+        }
+        if (window.AndroidBridge.shareToTelegram) {
+          window.AndroidBridge.shareToTelegram(text, appUrl);
+          return;
+        }
       }
 
-      // 2. Fallback to Telegram Web / App URL
+      // 2. Web Share API with image file attached (modern mobile browsers)
+      if (photoToShare && navigator.canShare) {
+        try {
+          const res = await fetch(photoToShare);
+          const blob = await res.blob();
+          const file = new File([blob], `${cat.name || 'cat'}.jpg`, { type: blob.type || 'image/jpeg' });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: `Кототека: ${cat.name}`,
+              text: `${text}\n${appUrl}`
+            });
+            return;
+          }
+        } catch (shareErr) {
+          console.log('Web share note:', shareErr);
+        }
+      }
+
+      // 3. Fallback to Telegram Web / App URL
       const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(text)}`;
       window.open(tgUrl, '_blank') || (window.location.href = tgUrl);
     } catch (e) {
@@ -1069,7 +1134,7 @@ class KototekaApp {
     }
   }
 
-  sharePostcardToTelegram() {
+  async sharePostcardToTelegram() {
     if (!this.currentPostcardDataUrl) return;
     const cat = this.currentPostcardCat;
     const appUrl = 'https://github.com/SLAWASTR/kototeka/releases/tag/v1.0.0';
@@ -1087,14 +1152,40 @@ class KototekaApp {
       `👤 Котолов: ${this.username}\n\n` +
       `📲 Скачивай приложение «Кототека» на Android и собирай котиков:`;
 
-    if (window.AndroidBridge && window.AndroidBridge.shareImage) {
-      window.AndroidBridge.shareImage(this.currentPostcardDataUrl, text + '\n' + appUrl);
-    } else if (window.AndroidBridge && window.AndroidBridge.shareToTelegram) {
-      window.AndroidBridge.shareToTelegram(text, appUrl);
-    } else {
-      const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(text)}`;
-      window.open(tgUrl, '_blank') || (window.location.href = tgUrl);
+    // 1. In native Android APK container, send postcard image directly to Telegram
+    if (window.AndroidBridge) {
+      if (window.AndroidBridge.shareImageToTelegram) {
+        window.AndroidBridge.shareImageToTelegram(this.currentPostcardDataUrl, text, appUrl);
+        return;
+      }
+      if (window.AndroidBridge.shareImage) {
+        window.AndroidBridge.shareImage(this.currentPostcardDataUrl, text + '\n' + appUrl);
+        return;
+      }
     }
+
+    // 2. Web Share API with image file
+    if (navigator.canShare) {
+      try {
+        const res = await fetch(this.currentPostcardDataUrl);
+        const blob = await res.blob();
+        const file = new File([blob], `Открытка_${cat ? cat.name : 'котик'}.png`, { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: `Кототека: ${cat ? cat.name : 'Открытка'}`,
+            text: `${text}\n${appUrl}`
+          });
+          return;
+        }
+      } catch (shareErr) {
+        console.log('Postcard web share note:', shareErr);
+      }
+    }
+
+    // 3. Fallback
+    const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(text)}`;
+    window.open(tgUrl, '_blank') || (window.location.href = tgUrl);
   }
 
   escapeHtml(str) {

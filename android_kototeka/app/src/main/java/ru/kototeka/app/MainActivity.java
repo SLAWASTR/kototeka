@@ -285,6 +285,83 @@ public class MainActivity extends Activity {
                 }
             });
         }
+
+        @JavascriptInterface
+        public void shareImageToTelegram(final String base64Data, final String text, final String url) {
+            runOnUiThread(() -> {
+                try {
+                    String cleanData = base64Data;
+                    if (cleanData.contains(",")) {
+                        cleanData = cleanData.substring(cleanData.indexOf(",") + 1);
+                    }
+                    byte[] imageBytes = Base64.decode(cleanData, Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+
+                    File cachePath = new File(getCacheDir(), "shared_photos");
+                    if (!cachePath.exists()) {
+                        cachePath.mkdirs();
+                    }
+                    File file = new File(cachePath, "cat_share.jpg");
+                    FileOutputStream stream = new FileOutputStream(file);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 92, stream);
+                    stream.flush();
+                    stream.close();
+
+                    Uri contentUri = FileProvider.getUriForFile(
+                        MainActivity.this,
+                        getPackageName() + ".fileprovider",
+                        file
+                    );
+
+                    String fullText = text;
+                    if (url != null && !url.isEmpty() && !fullText.contains(url)) {
+                        fullText = fullText + "\n" + url;
+                    }
+
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("image/*");
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, fullText);
+                    shareIntent.setClipData(ClipData.newRawUri("", contentUri));
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    // Try launching Telegram directly first
+                    boolean launched = false;
+                    String[] tgPackages = new String[]{
+                        "org.telegram.messenger",
+                        "org.thunderdog.challegram",
+                        "org.telegram.messenger.web",
+                        "org.telegram.plus"
+                    };
+
+                    for (String pkg : tgPackages) {
+                        try {
+                            getPackageManager().getPackageInfo(pkg, 0);
+                            shareIntent.setPackage(pkg);
+                            grantUriPermission(pkg, contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            startActivity(shareIntent);
+                            launched = true;
+                            break;
+                        } catch (Exception ignored) {}
+                    }
+
+                    // Fallback to system chooser if direct package launch didn't match
+                    if (!launched) {
+                        shareIntent.setPackage(null);
+                        List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(shareIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                        for (ResolveInfo resolveInfo : resInfoList) {
+                            String packageName = resolveInfo.activityInfo.packageName;
+                            grantUriPermission(packageName, contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        }
+                        Intent chooser = Intent.createChooser(shareIntent, "Отправить котика в Telegram");
+                        chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(chooser);
+                    }
+                } catch (Exception e) {
+                    shareToTelegram(text, url);
+                }
+            });
+        }
     }
 
     private File createImageFile() throws IOException {

@@ -1,20 +1,24 @@
 /**
- * Camera, Photo processing, and EXIF Metadata extraction for Kototeka
- * Resizes, optimizes images, extracts capture timestamps, and creates thumbnails
+ * Camera, Photo processing, EXIF Metadata & Geolocation extraction for Kototeka
+ * Resizes, optimizes images, extracts capture timestamps & GPS tags, and creates thumbnails
  */
 
 class ExifReader {
   /**
-   * Extract creation timestamp from photo EXIF tags or file metadata
+   * Extract creation timestamp and GPS coordinates from photo EXIF tags or file metadata
    * @param {File} file 
-   * @returns {Promise<{ date: Date, source: 'exif' | 'file' } | null>}
+   * @returns {Promise<{ date: Date | null, dateSource: 'exif' | 'file' | null, gps: { lat: number, lng: number, altitude: number | null } | null }>}
    */
-  static async extractDate(file) {
-    if (!file) return null;
+  static async extractMetadata(file) {
+    if (!file) return { date: null, dateSource: null, gps: null };
 
-    // 1. Try reading EXIF DateTimeOriginal / DateTime from JPEG
+    let exifDate = null;
+    let exifGps = null;
+
+    // 1. Try reading EXIF from JPEG
     try {
-      const slice = file.slice(0, 131072); // First 128KB is plenty for EXIF
+      // 256KB slice is guaranteed to contain full APP1 Exif segment
+      const slice = file.slice(0, 262144);
       const buffer = await slice.arrayBuffer();
       const view = new DataView(buffer);
 
@@ -34,11 +38,16 @@ class ExifReader {
                 view.getUint32(offset) === 0x45786966 &&
                 view.getUint16(offset + 4) === 0x0000) {
               const tiffOffset = offset + 6;
-              const dateStr = ExifReader.parseTiff(view, tiffOffset);
-              if (dateStr) {
-                const parsedDate = ExifReader.parseExifDateString(dateStr);
-                if (parsedDate && !isNaN(parsedDate.getTime())) {
-                  return { date: parsedDate, source: 'exif' };
+              const result = ExifReader.parseTiff(view, tiffOffset);
+              if (result) {
+                if (result.dateStr) {
+                  const parsedDate = ExifReader.parseExifDateString(result.dateStr);
+                  if (parsedDate && !isNaN(parsedDate.getTime())) {
+                    exifDate = parsedDate;
+                  }
+                }
+                if (result.gps) {
+                  exifGps = result.gps;
                 }
               }
             }
@@ -55,15 +64,23 @@ class ExifReader {
       console.log('EXIF parse note:', e);
     }
 
-    // 2. Fallback to file.lastModified if available and realistic (after year 2000)
-    if (file.lastModified && file.lastModified > 946684800000) {
+    // 2. Date fallback to file.lastModified if EXIF date was not found
+    let finalDate = exifDate;
+    let finalDateSource = exifDate ? 'exif' : null;
+
+    if (!finalDate && file.lastModified && file.lastModified > 946684800000) {
       const modDate = new Date(file.lastModified);
       if (!isNaN(modDate.getTime())) {
-        return { date: modDate, source: 'file' };
+        finalDate = modDate;
+        finalDateSource = 'file';
       }
     }
 
-    return null;
+    return {
+      date: finalDate,
+      dateSource: finalDateSource,
+      gps: exifGps
+    };
   }
 
   static parseTiff(view, tiffOffset) {
@@ -79,13 +96,15 @@ class ExifReader {
     const ifdOffset = view.getUint32(tiffOffset + 4, littleEndian);
     if (ifdOffset < 8 || tiffOffset + ifdOffset >= view.byteLength) return null;
 
-    return ExifReader.scanIfdForDate(view, tiffOffset, tiffOffset + ifdOffset, littleEndian);
+    return ExifReader.scanIfd(view, tiffOffset, tiffOffset + ifdOffset, littleEndian);
   }
 
-  static scanIfdForDate(view, tiffOffset, dirOffset, littleEndian) {
+  static scanIfd(view, tiffOffset, dirOffset, littleEndian) {
     if (dirOffset + 2 > view.byteLength) return null;
     const numEntries = view.getUint16(dirOffset, littleEndian);
+
     let exifSubIfdOffset = null;
+    let gpsIfdOffset = null;
     let dateTimeTagVal = null;
 
     for (let i = 0; i < numEntries; i++) {
@@ -99,12 +118,17 @@ class ExifReader {
         dateTimeTagVal = ExifReader.getStringValue(view, tiffOffset, entryOffset, littleEndian);
       }
       // 0x8769 = Exif IFD Pointer
-      if (tag === 0x8769) {
+      else if (tag === 0x8769) {
         exifSubIfdOffset = view.getUint32(entryOffset + 8, littleEndian);
+      }
+      // 0x8825 = GPS Info IFD Pointer
+      else if (tag === 0x8825) {
+        gpsIfdOffset = view.getUint32(entryOffset + 8, littleEndian);
       }
     }
 
-    // Search Exif SubIFD for 0x9003 (DateTimeOriginal) or 0x9004 (DateTimeDigitized)
+    // 1. Search Exif SubIFD for DateTimeOriginal (0x9003) or DateTimeDigitized (0x9004)
+    let dateStr = dateTimeTagVal;
     if (exifSubIfdOffset != null) {
       const subOffset = tiffOffset + exifSubIfdOffset;
       if (subOffset + 2 <= view.byteLength) {
@@ -116,13 +140,97 @@ class ExifReader {
           const tag = view.getUint16(entryOffset, littleEndian);
           if (tag === 0x9003 || tag === 0x9004) {
             const strVal = ExifReader.getStringValue(view, tiffOffset, entryOffset, littleEndian);
-            if (strVal) return strVal;
+            if (strVal) {
+              dateStr = strVal;
+              break;
+            }
           }
         }
       }
     }
 
-    return dateTimeTagVal;
+    // 2. Parse GPS Info IFD
+    let gps = null;
+    if (gpsIfdOffset != null) {
+      const gpsOffset = tiffOffset + gpsIfdOffset;
+      gps = ExifReader.parseGpsIfd(view, tiffOffset, gpsOffset, littleEndian);
+    }
+
+    return { dateStr, gps };
+  }
+
+  static parseGpsIfd(view, tiffOffset, gpsOffset, littleEndian) {
+    if (gpsOffset + 2 > view.byteLength) return null;
+    const numEntries = view.getUint16(gpsOffset, littleEndian);
+
+    let latRef = 'N';
+    let lngRef = 'E';
+    let latParts = null;
+    let lngParts = null;
+    let altitude = null;
+
+    for (let i = 0; i < numEntries; i++) {
+      const entryOffset = gpsOffset + 2 + i * 12;
+      if (entryOffset + 12 > view.byteLength) break;
+
+      const tag = view.getUint16(entryOffset, littleEndian);
+
+      if (tag === 0x0001) {
+        // GPSLatitudeRef ('N' or 'S')
+        latRef = String.fromCharCode(view.getUint8(entryOffset + 8)).toUpperCase();
+      } else if (tag === 0x0002) {
+        // GPSLatitude (3 rationals)
+        latParts = ExifReader.getRationals(view, tiffOffset, entryOffset, 3, littleEndian);
+      } else if (tag === 0x0003) {
+        // GPSLongitudeRef ('E' or 'W')
+        lngRef = String.fromCharCode(view.getUint8(entryOffset + 8)).toUpperCase();
+      } else if (tag === 0x0004) {
+        // GPSLongitude (3 rationals)
+        lngParts = ExifReader.getRationals(view, tiffOffset, entryOffset, 3, littleEndian);
+      } else if (tag === 0x0006) {
+        // GPSAltitude (1 rational)
+        const altParts = ExifReader.getRationals(view, tiffOffset, entryOffset, 1, littleEndian);
+        if (altParts && altParts.length > 0) altitude = altParts[0];
+      }
+    }
+
+    if (latParts && lngParts && latParts.length === 3 && lngParts.length === 3) {
+      let lat = latParts[0] + (latParts[1] / 60.0) + (latParts[2] / 3600.0);
+      let lng = lngParts[0] + (lngParts[1] / 60.0) + (lngParts[2] / 3600.0);
+
+      if (latRef === 'S') lat = -lat;
+      if (lngRef === 'W') lng = -lng;
+
+      if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat === 0 && lng === 0)) {
+        return {
+          lat: Number(lat.toFixed(6)),
+          lng: Number(lng.toFixed(6)),
+          altitude: altitude != null ? Math.round(altitude) : null
+        };
+      }
+    }
+
+    return null;
+  }
+
+  static getRationals(view, tiffOffset, entryOffset, count, littleEndian) {
+    const byteCount = count * 8;
+    let valOffset;
+    if (byteCount <= 4) {
+      valOffset = entryOffset + 8;
+    } else {
+      valOffset = tiffOffset + view.getUint32(entryOffset + 8, littleEndian);
+    }
+
+    if (valOffset + byteCount > view.byteLength) return null;
+
+    const result = [];
+    for (let i = 0; i < count; i++) {
+      const num = view.getUint32(valOffset + i * 8, littleEndian);
+      const den = view.getUint32(valOffset + i * 8 + 4, littleEndian);
+      result.push(den === 0 ? 0 : num / den);
+    }
+    return result;
   }
 
   static getStringValue(view, tiffOffset, entryOffset, littleEndian) {
@@ -167,8 +275,8 @@ class ExifReader {
 
 class PhotoProcessor {
   static async processFile(file, maxWidth = 1280, maxHeight = 1280, quality = 0.85) {
-    // Extract metadata date first
-    const detectedMeta = await ExifReader.extractDate(file);
+    // Extract metadata date and GPS coordinates
+    const detectedMeta = await ExifReader.extractMetadata(file);
 
     return new Promise((resolve, reject) => {
       if (!file || !file.type.startsWith('image/')) {
@@ -222,7 +330,8 @@ class PhotoProcessor {
               originalWidth: img.width,
               originalHeight: img.height,
               detectedDate: detectedMeta ? detectedMeta.date : null,
-              detectedDateSource: detectedMeta ? detectedMeta.source : null
+              detectedDateSource: detectedMeta ? detectedMeta.dateSource : null,
+              detectedGps: detectedMeta ? detectedMeta.gps : null
             });
           } catch (err) {
             reject(err);
