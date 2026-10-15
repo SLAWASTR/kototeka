@@ -1,0 +1,12 @@
+.DS_Store
+*.tmp
+__pycache__/
+*.pyc
+
+# Android build outputs
+android_kototeka/.gradle/
+android_kototeka/build/
+android_kototeka/app/build/
+android_kototeka/local.properties
+android_kototeka/.idea/
+*.iml

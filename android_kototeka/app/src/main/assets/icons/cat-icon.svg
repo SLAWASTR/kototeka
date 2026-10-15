@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF9E79"/>
+      <stop offset="100%" stop-color="#EA580C"/>
+    </linearGradient>
+    <linearGradient id="innerEar" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FED7AA"/>
+      <stop offset="100%" stop-color="#FDBA74"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded squircle -->
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+
+  <!-- Cat Silhouette Group with Shadow -->
+  <g filter="url(#shadow)">
+    <!-- Ears -->
+    <polygon points="120,240 160,110 240,190" fill="#FFFFFF"/>
+    <polygon points="140,225 170,135 225,195" fill="url(#innerEar)"/>
+
+    <polygon points="392,240 352,110 272,190" fill="#FFFFFF"/>
+    <polygon points="372,225 342,135 287,195" fill="url(#innerEar)"/>
+
+    <!-- Head -->
+    <ellipse cx="256" cy="275" rx="145" ry="125" fill="#FFFFFF"/>
+
+    <!-- Cheeks fluff -->
+    <path d="M115 285 C100 270 95 300 115 315 Z" fill="#FFFFFF"/>
+    <path d="M397 285 C412 270 417 300 397 315 Z" fill="#FFFFFF"/>
+
+    <!-- Eyes (happy closed curved eyes) -->
+    <path d="M185 265 Q205 245 225 265" fill="none" stroke="#334155" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="205" cy="252" r="4" fill="#334155"/>
+
+    <path d="M287 265 Q307 245 327 265" fill="none" stroke="#334155" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="307" cy="252" r="4" fill="#334155"/>
+
+    <!-- Blush -->
+    <ellipse cx="170" cy="285" rx="16" ry="9" fill="#FCA5A5" opacity="0.6"/>
+    <ellipse cx="342" cy="285" rx="16" ry="9" fill="#FCA5A5" opacity="0.6"/>
+
+    <!-- Nose -->
+    <polygon points="256,290 246,278 266,278" fill="#F472B6"/>
+
+    <!-- Mouth -->
+    <path d="M256 290 Q246 308 234 300" fill="none" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+    <path d="M256 290 Q266 308 278 300" fill="none" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+
+    <!-- Whiskers -->
+    <path d="M160 275 L110 265" stroke="#94A3B8" stroke-width="5" stroke-linecap="round"/>
+    <path d="M160 288 L105 288" stroke="#94A3B8" stroke-width="5" stroke-linecap="round"/>
+    <path d="M160 301 L115 310" stroke="#94A3B8" stroke-width="5" stroke-linecap="round"/>
+
+    <path d="M352 275 L402 265" stroke="#94A3B8" stroke-width="5" stroke-linecap="round"/>
+    <path d="M352 288 L407 288" stroke="#94A3B8" stroke-width="5" stroke-linecap="round"/>
+    <path d="M352 301 L397 310" stroke="#94A3B8" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- Camera lens / badge or cute paw collar -->
+    <circle cx="256" cy="385" r="46" fill="#F97316"/>
+    <!-- Paw inside collar badge -->
+    <ellipse cx="256" cy="392" rx="18" ry="14" fill="#FFFFFF"/>
+    <circle cx="240" cy="374" r="6" fill="#FFFFFF"/>
+    <circle cx="256" cy="370" r="6" fill="#FFFFFF"/>
+    <circle cx="272" cy="374" r="6" fill="#FFFFFF"/>
+  </g>
+</svg>
