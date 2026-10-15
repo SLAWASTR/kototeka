@@ -66,7 +66,9 @@
     <!-- Stats Bar -->
     <div class="collection-stats-bar">
       <span id="catsCountLabel">Котиков в коллекции: 0</span>
-      <span style="font-size:0.75rem; color:var(--text-subtle);">Offline-хранилище 💾</span>
+      <button type="button" id="userProfileBtn" class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="window.app.promptChangeUsername()" title="Сменить имя котолова">
+        <span id="usernameDisplay">👤 Котолов: slawastr ✏️</span>
+      </button>
     </div>
 
     <!-- Cat Cards Grid -->
@@ -313,7 +315,17 @@
         <div id="detailCatNotes" style="font-size:0.88rem; line-height:1.5; background:#fff7ed; border-left:3px solid var(--primary); padding:10px 14px; border-radius:0 var(--radius-md) var(--radius-md) 0;"></div>
       </div>
 
-      <div class="cat-detail-actions" style="margin-top:12px;">
+      <!-- Telegram Share & Postcard Generation -->
+      <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+        <button type="button" class="btn-primary" style="padding:11px 14px; font-size:0.92rem; background:linear-gradient(135deg, #2AABEE, #229ED9);" onclick="window.app.shareToTelegram()">
+          <span>✈️</span> Поделиться в Telegram
+        </button>
+        <button type="button" class="btn-secondary" style="justify-content:center; padding:10px 14px; font-size:0.85rem;" onclick="window.app.downloadCatCard()">
+          <span>🖼️</span> Скачать открытку с котиком (PNG)
+        </button>
+      </div>
+
+      <div class="cat-detail-actions" style="margin-top:8px;">
         <a id="detailOpenMapBtn" href="#" target="_blank" class="btn-secondary" style="flex:1; justify-content:center; text-decoration:none;">
           🗺️ Открыть на карте
         </a>
