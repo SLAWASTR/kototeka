@@ -83,27 +83,27 @@ public class MainActivity extends Activity {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 if (url == null) return false;
 
-                // Handle Telegram, external web and maps links
-                if (url.startsWith("https://t.me/") || url.startsWith("http://t.me/") || 
-                    url.startsWith("tg:") || url.startsWith("intent:")) {
+                // Any URL outside local android_asset files should be opened in external apps (Browser, Ozon, SBP, Telegram, Maps)
+                if (!url.startsWith("file:///android_asset/")) {
                     try {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        Intent intent;
+                        if (url.startsWith("intent:")) {
+                            intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+                        } else {
+                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        }
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         return true;
                     } catch (Exception e) {
-                        Toast.makeText(MainActivity.this, "Не удалось открыть Telegram", Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
-                }
-
-                // External links like GitHub releases or Yandex Maps
-                if (url.startsWith("http://") || url.startsWith("https://")) {
-                    if (!url.contains("android_asset")) {
                         try {
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                            startActivity(intent);
+                            Intent fallback = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            fallback.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(fallback);
                             return true;
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                            return false;
+                        }
                     }
                 }
 
