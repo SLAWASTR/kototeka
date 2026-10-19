@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Кототека: Охота на котиков</title>
+  <title>Кототека 2.0 — Коллекция городских котов</title>
   
-  <!-- PWA & Android Meta -->
-  <meta name="theme-color" content="#EA580C">
+  <!-- PWA & Mobile Meta -->
+  <meta name="theme-color" content="#F7F5F0" id="themeColorMeta">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Кототека">
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/svg+xml" href="./icons/cat-icon.svg">
@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
-  <!-- App Custom Styles -->
+  <!-- App 2.0 Custom Styles -->
   <link rel="stylesheet" href="./css/app.css">
 </head>
 <body>
@@ -26,60 +26,102 @@
   <!-- Top App Header -->
   <header class="app-header">
     <div class="brand-container">
-      <img src="./icons/cat-icon.svg" alt="Кототека" class="brand-icon">
-      <div>
-        <div class="brand-title">Кототека 🐾</div>
-        <div class="brand-subtitle">Создано slawastr • Охота на котиков</div>
+      <div class="brand-logo-wrap">
+        <img src="./icons/cat-icon.svg" alt="Кототека" class="brand-icon">
+      </div>
+      <div class="brand-titles">
+        <div class="brand-name">
+          <span>Кототека</span>
+          <span class="brand-badge">2.0</span>
+        </div>
+        <div class="brand-tagline">Твоя коллекция котов</div>
       </div>
     </div>
+    
     <div class="header-actions">
-      <button id="themeToggleBtn" class="icon-button" title="Тёмная/светлая тема">🌙</button>
-      <button id="soundToggleBtn" class="icon-button" title="Звуки">🔊</button>
-      <button id="exportBackupBtn" class="icon-button" title="Резервная копия (Экспорт)">💾</button>
-      <label for="importBackupInput" class="icon-button" title="Восстановить из файла" style="cursor:pointer;">📂</label>
-      <input type="file" id="importBackupInput" accept=".json" style="display:none;" />
+      <button type="button" id="userProfileBtn" class="header-user-pill" onclick="window.app.promptChangeUsername()" title="Сменить имя котолова">
+        <span class="user-pill-avatar">🐾</span>
+        <span id="usernameDisplay">slawastr</span>
+      </button>
+      <button type="button" id="themeToggleBtn" class="header-icon-btn" title="Сменить тему оформления">
+        <span id="themeToggleIcon">🌙</span>
+      </button>
+      <button type="button" id="backupModalBtn" class="header-icon-btn" onclick="window.app.openBackupModal()" title="Резервное копирование">
+        <span>💾</span>
+      </button>
     </div>
   </header>
 
   <!-- SCREEN 1: Кототека (Gallery Feed) -->
   <main id="galleryScreen" class="tab-screen active">
-    <!-- Search & Filters -->
-    <section class="search-filter-section">
-      <div class="search-input-wrapper">
+    <!-- Controls: Search & Native Filter Button -->
+    <section class="gallery-controls-section">
+      <div class="search-box">
         <span class="search-icon">🔍</span>
         <input type="text" id="catSearchInput" class="search-input" placeholder="Поиск по кличке, улице, заметке...">
+        <button type="button" id="searchClearBtn" class="search-clear-btn" style="display:none;" title="Очистить поиск">✕</button>
       </div>
-      <div class="filter-chips-container">
-        <button type="button" class="filter-chip active" data-filter="all">Все котики</button>
-        <button type="button" class="filter-chip" data-filter="Рыжий">🦊 Рыжие</button>
-        <button type="button" class="filter-chip" data-filter="Чёрный">🐈‍⬛ Чёрные</button>
-        <button type="button" class="filter-chip" data-filter="Трёхцветный">🌸 Трёхцветные</button>
-        <button type="button" class="filter-chip" data-filter="Полосатый">🐯 Полосатые</button>
-        <button type="button" class="filter-chip" data-filter="Белый">🤍 Белые</button>
-        <button type="button" class="filter-chip" data-filter="Ласковый">💖 Ласковые</button>
-        <button type="button" class="filter-chip" data-filter="Спит">💤 Спящие</button>
-        <button type="button" class="filter-chip" data-filter="Бандит">😎 Бандиты</button>
-        <button type="button" class="filter-chip" data-filter="manual">🗺️ Только ручные метки</button>
+
+      <div class="controls-toolbar">
+        <button type="button" id="openFilterBtn" class="btn-filter-trigger" onclick="window.app.openFilterModal()">
+          <svg class="control-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="21" x2="4" y2="14"></line>
+            <line x1="4" y1="10" x2="4" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12" y2="3"></line>
+            <line x1="20" y1="21" x2="20" y2="16"></line>
+            <line x1="20" y1="12" x2="20" y2="3"></line>
+            <line x1="1" y1="14" x2="7" y2="14"></line>
+            <line x1="9" y1="8" x2="15" y2="8"></line>
+            <line x1="17" y1="16" x2="23" y2="16"></line>
+          </svg>
+          <span>Фильтры</span>
+          <span id="activeFilterBadge" class="filter-count-badge" style="display:none;">0</span>
+        </button>
+
+        <button type="button" id="viewToggleBtn" class="btn-tool-icon" onclick="window.app.toggleViewLayout()" title="Переключить вид карточек">
+          <svg id="viewGridIcon" class="control-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+          </svg>
+          <svg id="viewListIcon" class="control-svg" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+        </button>
+
+        <button type="button" id="soundToggleBtn" class="btn-tool-icon" title="Звуки мурчания">
+          <span id="soundIcon">🔊</span>
+        </button>
       </div>
     </section>
 
-    <!-- Stats Bar -->
-    <div class="collection-stats-bar">
-      <span id="catsCountLabel">Котиков в коллекции: 0</span>
-      <button type="button" id="userProfileBtn" class="btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="window.app.promptChangeUsername()" title="Сменить имя котолова">
-        <span id="usernameDisplay">👤 Котолов: slawastr ✏️</span>
-      </button>
+    <!-- Collection Status & Active Tag Bar -->
+    <div class="collection-status-bar">
+      <span id="catsCountLabel" class="collection-count-text">Котиков в коллекции: 0</span>
+      <div id="activeFilterTagsWrap" class="active-tags-row" style="display:none;">
+        <span id="activeFilterDesc" class="active-tag-pill">Фильтр активен</span>
+        <button type="button" class="active-tag-reset" onclick="window.app.resetFilters()">✕ Сбросить</button>
+      </div>
     </div>
 
-    <!-- Cat Cards Grid -->
-    <div id="catsGrid" class="cats-grid"></div>
+    <!-- Cat Cards Grid (supports .view-grid and .view-cards) -->
+    <div id="catsGrid" class="cats-grid view-grid"></div>
 
     <!-- Empty State -->
     <div id="emptyState" class="empty-state" style="display:none;">
-      <div class="empty-icon">🐈</div>
-      <div class="empty-title">В коллекции пока нет котиков</div>
+      <div class="empty-symbol-wrap">
+        <img src="./icons/cat-icon.svg" alt="Пустая коллекция" class="empty-logo-art">
+      </div>
+      <div class="empty-title">Коллекция пока пуста</div>
       <div class="empty-desc">
-        Гуляйте по городу, нажимайте оранжевую кнопку с плюсом внизу и фотографируйте пушистых друзей!
+        Гуляйте по улицам, встречайте пушистиков и сохраняйте их в личную «Кототеку». Нажмите «+» внизу, чтобы запечатлеть первого кота!
       </div>
       <button type="button" class="btn-secondary" onclick="window.app.loadSampleCats()">
         🐾 Загрузить примеры котиков
@@ -90,8 +132,11 @@
   <!-- SCREEN 2: Карта всех находок -->
   <section id="mapScreen" class="tab-screen">
     <div class="map-floating-bar">
-      <span class="map-stat-text">🗺️ Карта всех встреченных котов</span>
-      <button id="mainMapLocateBtn" class="map-center-btn">
+      <div class="map-header-info">
+        <span class="map-stat-title">Карта встреч</span>
+        <span id="mapCatsCountSub" class="map-stat-sub">Котики на карте города</span>
+      </div>
+      <button type="button" id="mainMapLocateBtn" class="map-action-btn">
         <span>📍 Где я</span>
       </button>
     </div>
@@ -102,23 +147,27 @@
   <section id="achievementsScreen" class="tab-screen">
     <div class="achievements-header">
       <div class="achievements-summary-card">
-        <div>
+        <div class="summary-stat-col">
           <div id="statTotalCats" class="summary-stat-value">0</div>
           <div class="summary-stat-label">Всего котов</div>
         </div>
-        <div>
-          <div id="achUnlockedCount" class="summary-stat-value">0/10</div>
+        <div class="summary-stat-divider"></div>
+        <div class="summary-stat-col">
+          <div id="achUnlockedCount" class="summary-stat-value">0/18</div>
           <div class="summary-stat-label">Ачивок открыто</div>
         </div>
-        <div>
+        <div class="summary-stat-divider"></div>
+        <div class="summary-stat-col">
           <div id="statTopColor" class="summary-stat-value">—</div>
-          <div class="summary-stat-label">Топ окрас</div>
+          <div class="summary-stat-label">Любимый окрас</div>
         </div>
       </div>
     </div>
+
     <div id="achievementsList" class="achievements-list"></div>
-    <div style="text-align:center; padding:24px 0 12px 0; font-size:0.82rem; color:var(--text-subtle);">
-      🐾 «Кототека» создана <b>slawastr</b> • С любовью к уличным котикам
+
+    <div class="achievements-footer-credits">
+      Кототека 2.0 • Создано <b>slawastr</b> • С любовью к уличным котикам
     </div>
   </section>
 
@@ -126,57 +175,57 @@
   <nav class="bottom-nav">
     <button class="nav-item active" data-tab="gallery">
       <span class="nav-icon">🐱</span>
-      <span>Кототека</span>
+      <span class="nav-label">Кототека</span>
     </button>
     
     <div class="fab-container">
-      <button id="fabAddCat" class="fab-button" title="Сфотографировать кота">
-        <span>➕</span>
+      <button id="fabAddCat" class="fab-button" title="Добавить нового котика">
+        <span class="fab-plus-symbol">＋</span>
       </button>
     </div>
 
     <button class="nav-item" data-tab="map">
       <span class="nav-icon">🗺️</span>
-      <span>Карта</span>
+      <span class="nav-label">Карта</span>
     </button>
 
     <button class="nav-item" data-tab="achievements">
       <span class="nav-icon">🏆</span>
-      <span>Ачивки</span>
+      <span class="nav-label">Ачивки</span>
     </button>
   </nav>
 
   <!-- =========================================================================
-       MODAL: Добавить котика
+       MODAL: Добавить котика (Add Cat)
        ========================================================================= -->
   <div id="addCatModal" class="modal-overlay">
     <div class="modal-sheet">
       <div class="modal-header">
-        <h3 class="modal-title"><span>📸</span> Новый пушистик</h3>
+        <h3 class="modal-title"><span>📸</span> Новый котик</h3>
         <button type="button" class="modal-close-btn" onclick="window.app.closeAddCatModal()">✕</button>
       </div>
 
-      <form id="addCatForm" style="display:flex; flex-direction:column; gap:16px;">
+      <form id="addCatForm" class="modal-form-flow">
         <!-- Photo Uploader -->
         <div class="form-group">
-          <label class="form-label"><span>📷</span> Фото кота</label>
+          <label class="form-label"><span>📷</span> Фотография кота</label>
           <div id="photoUploaderBox" class="photo-uploader-box">
             <img id="previewPhotoImg" class="photo-preview-img" style="display:none;" alt="Предпросмотр" />
             <div id="photoUploaderContent" class="photo-uploader-content">
               <span class="photo-uploader-icon">📷</span>
               <span class="photo-uploader-text">Сфотографировать котика</span>
-              <span class="photo-uploader-sub">или загрузить из галереи</span>
+              <span class="photo-uploader-sub">или выбрать из медиатеки</span>
             </div>
           </div>
           <!-- Hidden Native Inputs for Camera and Gallery -->
           <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" />
           <input type="file" id="galleryInput" accept="image/*" style="display:none;" />
           <div class="photo-actions-row">
-            <button type="button" class="photo-action-btn" onclick="document.getElementById('cameraInput').click()">
+            <button type="button" class="btn-subtle-action" onclick="document.getElementById('cameraInput').click()">
               📸 Открыть камеру
             </button>
-            <button type="button" class="photo-action-btn" onclick="document.getElementById('galleryInput').click()">
-              🖼️ Выбрать из фото
+            <button type="button" class="btn-subtle-action" onclick="document.getElementById('galleryInput').click()">
+              🖼️ Выбрать из галереи
             </button>
           </div>
         </div>
@@ -191,12 +240,12 @@
         <div class="form-group">
           <label class="form-label" for="catDateInput"><span>📅</span> Дата и время встречи</label>
           <input type="datetime-local" id="catDateInput" class="form-input" required>
-          <div id="catDateDetectedNotice" style="display:none; font-size:0.75rem; color:#ea580c; font-weight:600; margin-top:4px;"></div>
+          <div id="catDateDetectedNotice" class="metadata-detected-badge" style="display:none;"></div>
         </div>
 
         <!-- Color Selector Chips -->
         <div class="form-group">
-          <label class="form-label"><span>🎨</span> Окрас</label>
+          <label class="form-label"><span>🎨</span> Окрас шерсти</label>
           <div id="colorChips" class="tag-chips-grid">
             <span class="tag-select-chip selected" data-val="Рыжий">Рыжий</span>
             <span class="tag-select-chip" data-val="Чёрный">Чёрный</span>
@@ -225,10 +274,10 @@
 
         <!-- Geolocation Dual Selector -->
         <div class="geo-section">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="geo-header-row">
             <label class="form-label" style="margin:0;"><span>📍</span> Геолокация находки</label>
           </div>
-          <div id="catGpsDetectedNotice" style="display:none; font-size:0.78rem; color:#ea580c; background:#fff7ed; border:1px solid #fed7aa; border-radius:var(--radius-sm); padding:6px 10px; margin:6px 0; font-weight:600;"></div>
+          <div id="catGpsDetectedNotice" class="metadata-detected-badge" style="display:none;"></div>
 
           <!-- Mode switcher tab -->
           <div class="geo-mode-switcher">
@@ -245,36 +294,36 @@
             <div class="geo-notice-banner">
               <span>💡</span>
               <div>
-                <b>Обход сбоев GPS:</b> просто ткните в нужное место на карте или перетащите лапку. Работает безотказно даже при спуфинге и глушилках в центре города!
+                <b>Обход сбоев GPS:</b> просто ткните в нужное место на карте или перетащите лапку. Работает безотказно даже при спуфинге в центре города!
               </div>
             </div>
 
             <!-- Address input with search -->
-            <div class="picker-search-bar" style="margin-top:8px;">
+            <div class="picker-search-bar">
               <input type="text" id="manualAddressInput" class="form-input" placeholder="Улица, дом или ориентир (напр. ул. Ленина, 5)" />
-              <button type="button" id="searchAddressBtn" class="btn-secondary" style="white-space:nowrap;">Найти</button>
+              <button type="button" id="searchAddressBtn" class="btn-subtle-action" style="white-space:nowrap;">Найти</button>
             </div>
 
             <!-- Mini Leaflet Picker Map -->
-            <div id="pickerMapContainer"></div>
-            <div style="font-size:0.72rem; color:var(--text-subtle); margin-top:4px; text-align:center;">
+            <div id="pickerMapContainer" class="picker-mini-map"></div>
+            <div class="picker-map-hint">
               👆 Тапните в любую точку карты или потяните маркер
             </div>
           </div>
 
           <!-- Auto GPS Mode Section -->
           <div id="geoAutoControls" style="display:none;">
-            <div class="geo-notice-banner" style="background:#eff6ff; border-color:#bfdbfe; color:#1e40af;">
+            <div class="geo-notice-banner gps-blue">
               <span>📡</span>
               <div>
-                Использует точный датчик GPS смартфона. Если спутники глушатся или показывают аэропорт — переключитесь на «Вручную».
+                Использует спутниковый датчик смартфона. Если спутники глушатся или показывают аэропорт — переключитесь на «Вручную».
               </div>
             </div>
             <button type="button" id="getGpsBtn" class="btn-secondary" style="width:100%; margin-top:8px; justify-content:center;">
-              📡 Определить координаты по GPS
+              📡 Запросить точные координаты GPS
             </button>
-            <div id="gpsStatusText" style="font-size:0.78rem; color:var(--text-muted); margin-top:8px; line-height:1.4;">
-              Нажмите кнопку выше, чтобы запросить геолокацию устройства
+            <div id="gpsStatusText" class="gps-status-info">
+              Нажмите кнопку выше для запроса геолокации
             </div>
           </div>
         </div>
@@ -282,11 +331,11 @@
         <!-- Notes Input -->
         <div class="form-group">
           <label class="form-label" for="catNotesInput"><span>📝</span> Заметки об этой встрече</label>
-          <textarea id="catNotesInput" class="form-textarea" placeholder="Угостили сосиской, дал погладить пузико, сидит у тёплого люка..."></textarea>
+          <textarea id="catNotesInput" class="form-textarea" placeholder="Угостили вкусняшкой, дал погладить пузико, сидит у тёплого люка..."></textarea>
         </div>
 
         <!-- Save Button -->
-        <button type="submit" class="btn-primary">
+        <button type="submit" class="btn-primary" style="margin-top:4px;">
           <span>🐾</span> Добавить котика в коллекцию!
         </button>
       </form>
@@ -294,47 +343,206 @@
   </div>
 
   <!-- =========================================================================
-       MODAL: Просмотр карточки котика
+       MODAL: Панель фильтров и сортировки (Native Bottom Sheet)
+       ========================================================================= -->
+  <div id="filterModal" class="modal-overlay">
+    <div class="modal-sheet filter-sheet">
+      <div class="modal-header">
+        <h3 class="modal-title">Параметры коллекции</h3>
+        <div class="filter-header-actions">
+          <button type="button" id="filterSheetResetBtn" class="btn-text-link" onclick="window.app.resetFilters()">Сбросить</button>
+          <button type="button" class="modal-close-btn" onclick="window.app.closeFilterModal()">✕</button>
+        </div>
+      </div>
+
+      <div class="filter-sheet-body">
+        <!-- 1. Сортировка -->
+        <div class="filter-section-block">
+          <div class="filter-section-title">Сортировка</div>
+          <div class="chip-options-wrap" id="sortFilterChips">
+            <button type="button" class="filter-select-chip selected" data-sort="newest">Сначала новые</button>
+            <button type="button" class="filter-select-chip" data-sort="oldest">Сначала старые</button>
+            <button type="button" class="filter-select-chip" data-sort="nameAsc">По кличке (А-Я)</button>
+            <button type="button" class="filter-select-chip" data-sort="nameDesc">По кличке (Я-А)</button>
+          </div>
+        </div>
+
+        <!-- 2. Окрас -->
+        <div class="filter-section-block">
+          <div class="filter-section-title">Окрас шерсти</div>
+          <div class="chip-options-wrap" id="colorFilterChips">
+            <button type="button" class="filter-select-chip selected" data-color="all">Все окрасы</button>
+            <button type="button" class="filter-select-chip" data-color="Рыжий">Рыжий</button>
+            <button type="button" class="filter-select-chip" data-color="Чёрный">Чёрный</button>
+            <button type="button" class="filter-select-chip" data-color="Трёхцветный">Трёхцветный</button>
+            <button type="button" class="filter-select-chip" data-color="Серый">Серый</button>
+            <button type="button" class="filter-select-chip" data-color="Полосатый">Полосатый</button>
+            <button type="button" class="filter-select-chip" data-color="Белый">Белый</button>
+            <button type="button" class="filter-select-chip" data-color="Сиамский">Сиамский</button>
+            <button type="button" class="filter-select-chip" data-color="Другой">Другой</button>
+          </div>
+        </div>
+
+        <!-- 3. Характер -->
+        <div class="filter-section-block">
+          <div class="filter-section-title">Характер и повадки</div>
+          <div class="chip-options-wrap" id="moodFilterChips">
+            <button type="button" class="filter-select-chip selected" data-mood="all">Любой характер</button>
+            <button type="button" class="filter-select-chip" data-mood="Ласковый">Ласковый</button>
+            <button type="button" class="filter-select-chip" data-mood="Спит">Спит</button>
+            <button type="button" class="filter-select-chip" data-mood="Бандит">Бандит</button>
+            <button type="button" class="filter-select-chip" data-mood="Пугливый">Пугливый</button>
+            <button type="button" class="filter-select-chip" data-mood="Охотник">Охотник</button>
+            <button type="button" class="filter-select-chip" data-mood="Мурчит">Мурчит</button>
+            <button type="button" class="filter-select-chip" data-mood="Важный">Важный</button>
+          </div>
+        </div>
+
+        <!-- 4. Наличие геолокации -->
+        <div class="filter-section-block">
+          <div class="filter-section-title">Геолокация</div>
+          <div class="chip-options-wrap" id="geoFilterChips">
+            <button type="button" class="filter-select-chip selected" data-geo="all">Любой способ</button>
+            <button type="button" class="filter-select-chip" data-geo="auto">📡 По GPS</button>
+            <button type="button" class="filter-select-chip" data-geo="manual">🗺️ Указано вручную</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-sheet-footer">
+        <button type="button" id="applyFiltersBtn" class="btn-primary" style="width:100%; justify-content:center;" onclick="window.app.applyFiltersAndClose()">
+          Показать котиков
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: Просмотр карточки котика (Cat Detail Modal)
        ========================================================================= -->
   <div id="catDetailModal" class="modal-overlay">
-    <div class="modal-sheet">
+    <div class="modal-sheet cat-detail-sheet">
       <div class="modal-header">
         <h3 id="detailCatName" class="modal-title">Барсик</h3>
         <button type="button" class="modal-close-btn" onclick="window.app.closeCatDetailModal()">✕</button>
       </div>
 
-      <img id="detailCatPhoto" class="cat-detail-hero" src="" alt="Фото кота">
+      <!-- Hero Photo with tap to fullscreen -->
+      <div class="detail-photo-wrapper" onclick="window.app.openFullscreenPhoto()">
+        <img id="detailCatPhoto" class="cat-detail-hero" src="" alt="Фото кота">
+        <div class="detail-photo-zoom-hint">🔍 Нажмите для оригинала</div>
+        <div id="detailPhotoGeoBadge" class="detail-photo-geo-badge">📍 GPS</div>
+      </div>
 
-      <div style="display:flex; flex-direction:column; gap:10px;">
-        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
-          <div id="detailCatDate" style="font-size:0.82rem; color:var(--text-subtle);"></div>
-          <button type="button" class="btn-secondary" style="padding:3px 9px; font-size:0.75rem;" onclick="window.app.editCatDate()">📅 Изменить дату</button>
+      <!-- Details Info Block -->
+      <div class="detail-content-flow">
+        <div class="detail-meta-row">
+          <div id="detailCatDate" class="detail-date-label"></div>
+          <button type="button" class="btn-subtle-action" style="padding:4px 10px; font-size:0.76rem;" onclick="window.app.openEditCatModal()">
+            ✏️ Редактировать
+          </button>
         </div>
-        <div id="detailCatLocation" style="font-size:0.92rem; font-weight:600; color:var(--text-main); display:flex; align-items:center; flex-wrap:wrap;"></div>
-        
-        <div id="detailCatTags" class="cat-card-tags"></div>
 
-        <div id="detailCatNotes" style="font-size:0.88rem; line-height:1.5; background:#fff7ed; border-left:3px solid var(--primary); padding:10px 14px; border-radius:0 var(--radius-md) var(--radius-md) 0;"></div>
+        <div id="detailCatLocation" class="detail-location-row"></div>
+        <div id="detailCatTags" class="detail-tags-row"></div>
+
+        <div id="detailCatNotes" class="detail-notes-card"></div>
       </div>
 
       <!-- Telegram Share & Postcard Generation -->
-      <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-        <button type="button" class="btn-primary" style="padding:11px 14px; font-size:0.92rem; background:linear-gradient(135deg, #2AABEE, #229ED9);" onclick="window.app.shareToTelegram()">
+      <div class="detail-primary-actions">
+        <button type="button" class="btn-telegram-share" onclick="window.app.shareToTelegram()">
           <span>✈️</span> Поделиться в Telegram
         </button>
-        <button type="button" class="btn-secondary" style="justify-content:center; padding:10px 14px; font-size:0.85rem;" onclick="window.app.downloadCatCard()">
-          <span>🖼️</span> Скачать открытку с котиком (PNG)
+        <button type="button" class="btn-postcard-action" onclick="window.app.downloadCatCard()">
+          <span>🖼️</span> Создать открытку (PNG)
         </button>
       </div>
 
-      <div class="cat-detail-actions" style="margin-top:8px;">
-        <a id="detailOpenMapBtn" href="#" target="_blank" class="btn-secondary" style="flex:1; justify-content:center; text-decoration:none;">
-          🗺️ Открыть на карте
+      <div class="cat-detail-footer-actions">
+        <a id="detailOpenMapBtn" href="#" target="_blank" class="btn-subtle-action" style="flex:1; justify-content:center; text-decoration:none;">
+          🗺️ Показать на карте
         </a>
         <button type="button" class="btn-outline-danger" onclick="window.app.deleteCurrentCat()">
           🗑️ Удалить
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: Полноэкранный просмотр оригинального фото (Fullscreen Viewer)
+       ========================================================================= -->
+  <div id="fullscreenPhotoModal" class="fullscreen-photo-modal">
+    <div class="fullscreen-photo-header">
+      <div id="fullscreenCatTitle" class="fullscreen-photo-title">Фото котика</div>
+      <button type="button" class="fullscreen-close-btn" onclick="window.app.closeFullscreenPhoto()">✕</button>
+    </div>
+    <div class="fullscreen-photo-viewport" onclick="window.app.closeFullscreenPhoto()">
+      <img id="fullscreenImg" src="" alt="Оригинальное фото" class="fullscreen-photo-img" onclick="event.stopPropagation()">
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: Редактировать карточку котика (Edit Cat)
+       ========================================================================= -->
+  <div id="editCatModal" class="modal-overlay">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Редактировать</h3>
+        <button type="button" class="modal-close-btn" onclick="window.app.closeEditCatModal()">✕</button>
+      </div>
+
+      <form id="editCatForm" class="modal-form-flow">
+        <div class="form-group">
+          <label class="form-label" for="editCatNameInput">Кличка / Описание</label>
+          <input type="text" id="editCatNameInput" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editCatDateInput">Дата и время встречи</label>
+          <input type="datetime-local" id="editCatDateInput" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editCatAddressInput">Место встречи / Адрес</label>
+          <input type="text" id="editCatAddressInput" class="form-input" placeholder="Улица, дом или парк">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Окрас</label>
+          <div id="editColorChips" class="tag-chips-grid">
+            <span class="tag-select-chip" data-val="Рыжий">Рыжий</span>
+            <span class="tag-select-chip" data-val="Чёрный">Чёрный</span>
+            <span class="tag-select-chip" data-val="Трёхцветный">Трёхцветный</span>
+            <span class="tag-select-chip" data-val="Серый">Серый</span>
+            <span class="tag-select-chip" data-val="Полосатый">Полосатый</span>
+            <span class="tag-select-chip" data-val="Белый">Белый</span>
+            <span class="tag-select-chip" data-val="Сиамский">Сиамский</span>
+            <span class="tag-select-chip" data-val="Другой">Другой</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Характер</label>
+          <div id="editMoodChips" class="tag-chips-grid">
+            <span class="tag-select-chip" data-val="Ласковый">Ласковый</span>
+            <span class="tag-select-chip" data-val="Спит">Спит</span>
+            <span class="tag-select-chip" data-val="Бандит">Бандит</span>
+            <span class="tag-select-chip" data-val="Пугливый">Пугливый</span>
+            <span class="tag-select-chip" data-val="Охотник">Охотник</span>
+            <span class="tag-select-chip" data-val="Мурчит">Мурчит</span>
+            <span class="tag-select-chip" data-val="Важный">Важный</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editCatNotesInput">Заметки</label>
+          <textarea id="editCatNotesInput" class="form-textarea" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top:6px;">Сохранить изменения</button>
+      </form>
     </div>
   </div>
 
@@ -348,15 +556,41 @@
         <button type="button" class="modal-close-btn" onclick="document.getElementById('postcardModal').classList.remove('open')">✕</button>
       </div>
 
-      <img id="postcardPreviewImg" style="width:100%; border-radius:14px; box-shadow:0 4px 14px rgba(0,0,0,0.15); margin-top:6px;" alt="Открытка с котиком">
+      <img id="postcardPreviewImg" class="postcard-preview-frame" alt="Открытка с котиком">
 
-      <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+      <div class="postcard-actions-block">
         <button type="button" class="btn-primary" onclick="window.app.savePostcardToDevice()">
-          <span>💾</span> Сохранить открытку в Галерею
+          <span>💾</span> Сохранить в Галерею
         </button>
-        <button type="button" class="btn-secondary" style="justify-content:center; padding:10px 14px;" onclick="window.app.sharePostcardToTelegram()">
+        <button type="button" class="btn-telegram-share" style="justify-content:center;" onclick="window.app.sharePostcardToTelegram()">
           <span>✈️</span> Отправить в Telegram
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: Резервная копия (Backup & Restore)
+       ========================================================================= -->
+  <div id="backupModal" class="modal-overlay">
+    <div class="modal-sheet" style="max-width:400px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Резервная копия</h3>
+        <button type="button" class="modal-close-btn" onclick="window.app.closeBackupModal()">✕</button>
+      </div>
+
+      <p class="modal-description-text">
+        Вы можете сохранить всю вашу коллекцию котиков (включая фотографии и заметки) в один JSON-файл или восстановить данные на новом телефоне.
+      </p>
+
+      <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+        <button type="button" class="btn-primary" onclick="window.app.exportBackup()">
+          💾 Экспорт коллекции (Скачать JSON)
+        </button>
+        <label for="importBackupInput" class="btn-secondary" style="justify-content:center; cursor:pointer;">
+          📂 Восстановить из файла
+        </label>
+        <input type="file" id="importBackupInput" accept=".json" style="display:none;" />
       </div>
     </div>
   </div>
@@ -365,16 +599,16 @@
        MODAL: Приветствие и выбор имени при первом входе
        ========================================================================= -->
   <div id="welcomeUserModal" class="modal-overlay">
-    <div class="modal-sheet" style="max-width:380px; text-align:center;">
-      <div style="font-size:3rem; margin-bottom:8px;">🐾</div>
-      <h3 class="modal-title" style="justify-content:center; font-size:1.3rem;">Добро пожаловать в Кототеку!</h3>
-      <p style="font-size:0.88rem; color:var(--text-subtle); margin:8px 0 16px; line-height:1.4;">
-        Как вас зовут, исследователь городских котиков? Ваше имя будет украшать карточки находок и открытки для Telegram!
+    <div class="modal-sheet welcome-sheet">
+      <div class="welcome-badge-icon">🐾</div>
+      <h3 class="modal-title" style="justify-content:center; font-size:1.35rem; font-weight:800;">Добро пожаловать в Кототеку!</h3>
+      <p class="modal-description-text">
+        Как зовут главного исследователя городских котиков? Ваше имя будет украшать карточки находок и открытки для Telegram!
       </p>
 
-      <form id="welcomeUserForm" style="display:flex; flex-direction:column; gap:12px;">
+      <form id="welcomeUserForm" style="display:flex; flex-direction:column; gap:12px; margin-top:12px;">
         <input type="text" id="welcomeUsernameInput" class="form-input" placeholder="Ваше имя или позывной..." maxlength="30" required autofocus />
-        <button type="submit" class="btn-primary" style="justify-content:center; padding:12px;">
+        <button type="submit" class="btn-primary" style="justify-content:center; padding:13px;">
           <span>🚀</span> Начать сбор котиков!
         </button>
       </form>

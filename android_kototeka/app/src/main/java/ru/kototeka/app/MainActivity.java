@@ -281,7 +281,7 @@ public class MainActivity extends Activity {
                     startActivity(Intent.createChooser(shareIntent, "Поделиться открыткой с котиком"));
                 } catch (Exception e) {
                     // Fallback to text share
-                    shareToTelegram(text, "https://github.com/SLAWASTR/kototeka/releases/tag/v1.0.0");
+                    shareToTelegram(text, "https://github.com/SLAWASTR/kototeka/releases/tag/v2.0.0");
                 }
             });
         }

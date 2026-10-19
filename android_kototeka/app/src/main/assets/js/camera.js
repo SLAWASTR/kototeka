@@ -274,7 +274,11 @@ class ExifReader {
 }
 
 class PhotoProcessor {
-  static async processFile(file, maxWidth = 1280, maxHeight = 1280, quality = 0.85) {
+  /**
+   * Process and optimize uploaded image
+   * Keeps high-definition 2560px original and generates a crisp 640px retina thumbnail
+   */
+  static async processFile(file, maxWidth = 2560, maxHeight = 2560, quality = 0.92) {
     // Extract metadata date and GPS coordinates
     const detectedMeta = await ExifReader.extractMetadata(file);
 
@@ -289,7 +293,7 @@ class PhotoProcessor {
         const img = new Image();
         img.onload = () => {
           try {
-            // 1. Calculate resized dimensions for main photo
+            // 1. Calculate resized dimensions for main high-res photo
             let width = img.width;
             let height = img.height;
 
@@ -307,22 +311,26 @@ class PhotoProcessor {
             canvas.width = width;
             canvas.height = height;
             const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(img, 0, 0, width, height);
             const fullPhotoDataUrl = canvas.toDataURL('image/jpeg', quality);
 
-            // 2. Generate square thumbnail (160x160)
-            const thumbSize = 160;
+            // 2. Generate crisp 640x640 square thumbnail for retina displays (2x / 3x)
+            const thumbSize = 640;
             const thumbCanvas = document.createElement('canvas');
             thumbCanvas.width = thumbSize;
             thumbCanvas.height = thumbSize;
             const thumbCtx = thumbCanvas.getContext('2d');
+            thumbCtx.imageSmoothingEnabled = true;
+            thumbCtx.imageSmoothingQuality = 'high';
 
             const minDim = Math.min(img.width, img.height);
             const sx = (img.width - minDim) / 2;
             const sy = (img.height - minDim) / 2;
 
             thumbCtx.drawImage(img, sx, sy, minDim, minDim, 0, 0, thumbSize, thumbSize);
-            const thumbDataUrl = thumbCanvas.toDataURL('image/jpeg', 0.8);
+            const thumbDataUrl = thumbCanvas.toDataURL('image/jpeg', 0.88);
 
             resolve({
               photo: fullPhotoDataUrl,
