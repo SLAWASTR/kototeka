@@ -1,61 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <defs>
-    <!-- Background subtle gradient -->
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF824C"/>
-      <stop offset="100%" stop-color="#FF5D22"/>
-    </linearGradient>
-
-    <!-- Inner lens glass gradient -->
-    <linearGradient id="lensGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95"/>
-      <stop offset="100%" stop-color="#F7F5F0" stop-opacity="0.90"/>
-    </linearGradient>
-
-    <!-- Shadow -->
-    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#B83A0E" flood-opacity="0.30"/>
-    </feDropShadow>
-  </defs>
-
-  <!-- iOS squircle canvas background -->
-  <rect width="512" height="512" rx="116" fill="url(#bgGrad)"/>
-
-  <!-- Logo Mark: Geometric Cat Camera Viewfinder -->
-  <g filter="url(#softShadow)">
-    <!-- Cat Ears + Camera Body Silhouette (Pure White) -->
-    <path d="
-      M 160 148 
-      L 196 208 
-      L 316 208 
-      L 352 148 
-      C 358 138 372 142 370 154 
-      L 362 216 
-      C 396 220 416 244 416 280 
-      L 416 368 
-      C 416 404 388 428 352 428 
-      L 160 428 
-      C 124 428 96 404 96 368 
-      L 96 280 
-      C 96 244 116 220 150 216 
-      L 142 154 
-      C 140 142 154 138 160 148 
-      Z
-    " fill="#FFFFFF"/>
-
-    <!-- Inner Cat Ear Cutouts (Terracotta accent) -->
-    <path d="M 166 172 L 186 208 L 154 208 Z" fill="#FF7138" opacity="0.95"/>
-    <path d="M 346 172 L 358 208 L 326 208 Z" fill="#FF7138" opacity="0.95"/>
-
-    <!-- Central Camera Lens / Cat Pupil Ring -->
-    <circle cx="256" cy="324" r="66" fill="#FF7138"/>
-    <circle cx="256" cy="324" r="54" fill="#FFFFFF"/>
-    <circle cx="256" cy="324" r="34" fill="#FF7138"/>
-
-    <!-- Reflection glint in lens -->
-    <circle cx="268" cy="312" r="10" fill="#FFFFFF" opacity="0.9"/>
-
-    <!-- Flash / Finder dot top right -->
-    <circle cx="372" cy="254" r="12" fill="#FF7138" opacity="0.85"/>
+  <rect width="512" height="512" rx="128" fill="#111113"/>
+  <!-- Minimalist Geometric Cat Silhouette with Camera Aperture Lens -->
+  <g fill="#FFFFFF">
+    <!-- Left Ear -->
+    <path d="M 130 180 L 160 80 C 164 68 180 72 186 86 L 220 180 Z"/>
+    <!-- Right Ear -->
+    <path d="M 382 180 L 352 80 C 348 68 332 72 326 86 L 292 180 Z"/>
+    <!-- Cat Head & Body Contour -->
+    <rect x="116" y="160" width="280" height="230" rx="90" fill="#FFFFFF"/>
+    <!-- Camera Viewfinder Top Bar -->
+    <rect x="220" y="130" width="72" height="30" rx="8" fill="#FFFFFF"/>
+  </g>
+  <!-- Inner Details cut out in Carbon Black -->
+  <g fill="#111113">
+    <!-- Left Inner Ear -->
+    <path d="M 148 170 L 168 108 L 195 170 Z"/>
+    <!-- Right Inner Ear -->
+    <path d="M 364 170 L 344 108 L 317 170 Z"/>
+    <!-- Central Camera Lens / Cat Iris -->
+    <circle cx="256" cy="275" r="54" fill="#111113"/>
+    <circle cx="256" cy="275" r="42" fill="#FFFFFF"/>
+    <circle cx="256" cy="275" r="26" fill="#111113"/>
+    <circle cx="264" cy="267" r="7" fill="#FFFFFF"/>
+    <!-- Cat Whiskers Minimalist Dash -->
+    <rect x="136" y="268" width="34" height="4" rx="2" fill="#111113"/>
+    <rect x="142" y="282" width="28" height="4" rx="2" fill="#111113"/>
+    <rect x="342" y="268" width="34" height="4" rx="2" fill="#111113"/>
+    <rect x="342" y="282" width="28" height="4" rx="2" fill="#111113"/>
+    <!-- Cute Cat Nose & Smile -->
+    <path d="M 248 338 L 264 338 L 256 346 Z"/>
+    <path d="M 242 352 C 248 358 254 358 256 352 C 258 358 264 358 270 352" stroke="#111113" stroke-width="4" stroke-linecap="round" fill="none"/>
   </g>
 </svg>

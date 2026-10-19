@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Cat Face Silhouette for Material You Themed Icons -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 32,40 L 38,22 C 39,19 43,20 44,23 L 51,40 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 76,40 L 70,22 C 69,19 65,20 64,23 L 57,40 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 34,38 L 74,38 C 84,38 88,46 88,58 L 88,74 C 88,86 80,92 68,92 L 40,92 C 28,92 20,86 20,74 L 20,58 C 20,46 24,38 34,38 Z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 54,52 A 10,10 0 1 0 54,72 A 10,10 0 1 0 54,52 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 54,56 A 6,6 0 1 0 54,68 A 6,6 0 1 0 54,56 Z" />
+</vector>

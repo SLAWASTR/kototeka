@@ -1,41 +1,44 @@
 /**
- * Кототека 2.0 — Premium Apple-inspired Design System
- * Clean typography, milky warm palette, native-first components
+ * Кототека 2.0 — Material 3 Expressive Monochrome
+ * Neutral minimal palette, high contrast, expressive pill geometry
  */
 
 :root {
-  /* Light Theme Palette */
-  --bg-main: #F7F5F0;
+  /* Material 3 Expressive Monochrome (Light Theme) */
+  --bg-main: #F4F4F6;
   --bg-surface: #FFFFFF;
   --bg-elevated: #FFFFFF;
-  --bg-subtle: #EFECE6;
-  --bg-glass: rgba(247, 245, 240, 0.88);
+  --bg-subtle: #ECEEF2;
+  --bg-glass: rgba(244, 244, 246, 0.90);
   --bg-sheet: #FFFFFF;
 
-  --text-primary: #191B20;
-  --text-secondary: #858995;
-  --text-tertiary: #A6ABB7;
+  --text-primary: #111113;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
   --text-inverse: #FFFFFF;
 
-  --accent: #FF7138;
-  --accent-hover: #F25F22;
-  --accent-light: #FFF1EB;
-  --accent-glass: rgba(255, 113, 56, 0.12);
+  /* Expressive Monochrome Accent (Solid Carbon Black) */
+  --accent: #111113;
+  --accent-hover: #27272A;
+  --accent-light: #ECEEF2;
+  --accent-glass: rgba(17, 17, 19, 0.08);
 
-  --border-subtle: #E9E7E2;
-  --border-strong: #DCD8D0;
+  --border-subtle: #E2E4E9;
+  --border-strong: #D1D5DB;
+
+  --donate-accent: #E11D48;
 
   /* Elevation Shadows */
-  --shadow-sm: 0 1px 3px rgba(25, 27, 32, 0.04), 0 1px 2px rgba(25, 27, 32, 0.02);
-  --shadow-md: 0 4px 12px rgba(25, 27, 32, 0.06), 0 1px 3px rgba(25, 27, 32, 0.03);
-  --shadow-lg: 0 12px 32px rgba(25, 27, 32, 0.08), 0 4px 12px rgba(25, 27, 32, 0.04);
-  --shadow-fab: 0 8px 24px rgba(255, 113, 56, 0.35);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 14px 36px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.03);
+  --shadow-fab: 0 8px 24px rgba(0, 0, 0, 0.25);
 
-  /* Geometry */
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  /* Geometry - Material 3 Expressive Rounded Shapes */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
   --radius-full: 9999px;
 
   /* Layout Heights & Safe Areas */
@@ -45,36 +48,39 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 
   /* Transitions */
-  --spring-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring-ease: cubic-bezier(0.2, 1, 0.3, 1);
   --fast-ease: cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* Dark Theme Overrides */
+/* Material 3 Expressive Monochrome (AMOLED Deep Dark Theme) */
 body.dark-mode {
-  --bg-main: #121316;
-  --bg-surface: #1B1D22;
-  --bg-elevated: #24262E;
-  --bg-subtle: #202229;
-  --bg-glass: rgba(18, 19, 22, 0.90);
-  --bg-sheet: #1B1D22;
+  --bg-main: #090A0C;
+  --bg-surface: #131418;
+  --bg-elevated: #1A1C22;
+  --bg-subtle: #1C1E24;
+  --bg-glass: rgba(9, 10, 12, 0.92);
+  --bg-sheet: #131418;
 
-  --text-primary: #F5F6F8;
-  --text-secondary: #8E929E;
-  --text-tertiary: #606470;
-  --text-inverse: #121316;
+  --text-primary: #F8F9FA;
+  --text-secondary: #9499A8;
+  --text-tertiary: #5E6372;
+  --text-inverse: #090A0C;
 
-  --accent: #FF7138;
-  --accent-hover: #FF824C;
-  --accent-light: rgba(255, 113, 56, 0.15);
-  --accent-glass: rgba(255, 113, 56, 0.18);
+  /* Expressive Monochrome Accent (Crisp Pure White) */
+  --accent: #F8F9FA;
+  --accent-hover: #E4E5E9;
+  --accent-light: rgba(248, 249, 250, 0.12);
+  --accent-glass: rgba(248, 249, 250, 0.15);
 
-  --border-subtle: #272A32;
-  --border-strong: #363A45;
+  --border-subtle: #23262E;
+  --border-strong: #323642;
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.50);
-  --shadow-fab: 0 8px 24px rgba(255, 113, 56, 0.40);
+  --donate-accent: #FB7185;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 18px 45px rgba(0, 0, 0, 0.65);
+  --shadow-fab: 0 8px 24px rgba(255, 255, 255, 0.18);
 }
 
 /* Reset and Base Styles */
@@ -637,30 +643,44 @@ button, input, textarea, select {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s var(--fast-ease);
   padding: 6px 0;
 }
 
-.nav-item .nav-icon {
-  font-size: 1.35rem;
+.nav-icon-wrap {
+  width: 48px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s var(--spring-ease);
+}
+
+.nav-item .nav-svg {
+  display: block;
   transition: transform 0.2s var(--spring-ease);
 }
 
 .nav-item .nav-label {
-  font-size: 0.70rem;
+  font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: -0.01em;
+  transition: color 0.2s, font-weight 0.2s;
 }
 
-.nav-item.active {
-  color: var(--accent);
+.nav-item.active .nav-icon-wrap {
+  background: var(--accent);
+  color: var(--text-inverse);
+  transform: scale(1.04);
 }
 
-.nav-item.active .nav-icon {
-  transform: translateY(-2px) scale(1.12);
+.nav-item.active .nav-label {
+  color: var(--text-primary);
+  font-weight: 700;
 }
 
 /* Center Floating Add Button */
@@ -679,7 +699,7 @@ button, input, textarea, select {
   height: 54px;
   border-radius: var(--radius-full);
   background: var(--accent);
-  color: #FFFFFF;
+  color: var(--text-inverse);
   box-shadow: var(--shadow-fab);
   border: 3px solid var(--bg-main);
   display: flex;
@@ -693,12 +713,6 @@ button, input, textarea, select {
   transform: scale(0.92);
 }
 
-.fab-plus-symbol {
-  font-size: 1.6rem;
-  font-weight: 300;
-  line-height: 1;
-}
-
 /* =========================================================================
    Buttons & Common UI Components
    ========================================================================= */
@@ -708,13 +722,13 @@ button, input, textarea, select {
   justify-content: center;
   gap: 8px;
   background: var(--accent);
-  color: #FFFFFF;
+  color: var(--text-inverse);
   border-radius: var(--radius-md);
   padding: 12px 18px;
   font-weight: 700;
   font-size: 0.92rem;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(255, 113, 56, 0.25);
+  box-shadow: var(--shadow-md);
   transition: all 0.2s var(--fast-ease);
 }
 
@@ -993,7 +1007,7 @@ button, input, textarea, select {
 
 .filter-select-chip.selected {
   background: var(--accent);
-  color: #FFFFFF;
+  color: var(--text-inverse);
 }
 
 .filter-sheet-footer {
@@ -1315,7 +1329,7 @@ button, input, textarea, select {
 
 .tag-select-chip.selected {
   background: var(--accent);
-  color: #FFFFFF;
+  color: var(--text-inverse);
 }
 
 /* Geolocation Section */

@@ -87,15 +87,17 @@ class KototekaApp {
     const isDark = theme === 'dark';
     document.body.classList.toggle('dark-mode', isDark);
     localStorage.setItem('kototeka_theme', theme);
-    
+
     const themeIcon = document.getElementById('themeToggleIcon');
     if (themeIcon) {
-      themeIcon.textContent = isDark ? '☀️' : '🌙';
+      themeIcon.innerHTML = isDark 
+        ? '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>'
+        : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
     }
 
     const metaColor = document.getElementById('themeColorMeta');
     if (metaColor) {
-      metaColor.setAttribute('content', isDark ? '#121316' : '#F7F5F0');
+      metaColor.setAttribute('content', isDark ? '#090A0C' : '#F4F4F6');
     }
   }
 
@@ -161,8 +163,12 @@ class KototekaApp {
     if (soundBtn) {
       soundBtn.addEventListener('click', () => {
         window.soundMuted = !window.soundMuted;
-        const icon = document.getElementById('soundIcon');
-        if (icon) icon.textContent = window.soundMuted ? '🔇' : '🔊';
+        const iconSvg = document.getElementById('soundIconSvg');
+        if (iconSvg) {
+          iconSvg.innerHTML = window.soundMuted 
+            ? '<line x1="1" y1="1" x2="23" y2="23"></line><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>'
+            : '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
+        }
       });
     }
 
@@ -1161,18 +1167,18 @@ class KototekaApp {
       ctx.stroke();
 
       // Top Brand Header
-      ctx.fillStyle = '#FF7138';
+      ctx.fillStyle = isDark ? '#FFFFFF' : '#111113';
       ctx.font = 'bold 36px -apple-system, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('🐾 КОТОТЕКА 2.0', 500, 105);
 
-      ctx.fillStyle = isDark ? '#8E929E' : '#858995';
+      ctx.fillStyle = isDark ? '#9499A8' : '#6B7280';
       ctx.font = '22px -apple-system, sans-serif';
       ctx.fillText(`Личная карточка котика • Котолов: ${this.username}`, 500, 142);
 
       const drawContent = () => {
         // Cat Name
-        ctx.fillStyle = isDark ? '#F5F6F8' : '#191B20';
+        ctx.fillStyle = isDark ? '#F8F9FA' : '#111113';
         ctx.font = 'bold 54px -apple-system, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(cat.name, 500, 835);
@@ -1181,14 +1187,14 @@ class KototekaApp {
         const dateStr = new Date(cat.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
         const locStr = cat.location ? (cat.location.address || `${cat.location.lat}, ${cat.location.lng}`) : 'Городские улицы';
 
-        ctx.fillStyle = isDark ? '#8E929E' : '#858995';
+        ctx.fillStyle = isDark ? '#9499A8' : '#6B7280';
         ctx.font = '26px -apple-system, sans-serif';
         ctx.fillText(`📅 ${dateStr}`, 500, 885);
         ctx.fillText(`📍 ${locStr.slice(0, 44)}`, 500, 930);
 
         // Badges: Color & Mood
         const tagText = `${cat.color || 'Особенный'}  •  ${cat.mood || 'Милый'}`;
-        ctx.fillStyle = '#FF7138';
+        ctx.fillStyle = isDark ? '#E4E5E9' : '#111113';
         ctx.font = 'bold 28px -apple-system, sans-serif';
         ctx.fillText(tagText, 500, 985);
 

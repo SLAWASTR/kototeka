@@ -1,25 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none">
-  <!-- Cat Camera Frame -->
-  <path d="
-    M 15 13 
-    L 19 19 
-    L 29 19 
-    L 33 13 
-    C 33.6 12 35 12.4 34.8 13.6 
-    L 34 19.8 
-    C 37.4 20.2 39.4 22.6 39.4 26.2 
-    L 39.4 35 
-    C 39.4 38.6 36.6 41 33 41 
-    L 15 41 
-    C 11.4 41 8.6 38.6 8.6 35 
-    L 8.6 26.2 
-    C 8.6 22.6 10.6 20.2 14 19.8 
-    L 13.2 13.6 
-    C 13 12.4 14.4 12 15 13 
-    Z
-  " fill="currentColor"/>
-  <!-- Inner Lens Cutout -->
-  <circle cx="24" cy="30.5" r="5.5" fill="var(--bg-main, #F7F5F0)"/>
-  <!-- Mini Flash -->
-  <circle cx="34.5" cy="24" r="1.5" fill="var(--bg-main, #F7F5F0)"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <g fill="currentColor">
+    <path d="M 130 180 L 160 80 C 164 68 180 72 186 86 L 220 180 Z"/>
+    <path d="M 382 180 L 352 80 C 348 68 332 72 326 86 L 292 180 Z"/>
+    <rect x="116" y="160" width="280" height="230" rx="90"/>
+    <rect x="220" y="130" width="72" height="30" rx="8"/>
+  </g>
 </svg>

@@ -1,0 +1,49 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="1.0"
+        android:scaleY="1.0">
+        <!-- White Cat Silhouette -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M 32,40 L 38,22 C 39,19 43,20 44,23 L 51,40 Z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M 76,40 L 70,22 C 69,19 65,20 64,23 L 57,40 Z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M 34,38 L 74,38 C 84,38 88,46 88,58 L 88,74 C 88,86 80,92 68,92 L 40,92 C 28,92 20,86 20,74 L 20,58 C 20,46 24,38 34,38 Z" />
+        
+        <!-- Inner Details in Carbon Black -->
+        <path
+            android:fillColor="#111113"
+            android:pathData="M 35,37 L 39,26 L 45,37 Z" />
+        <path
+            android:fillColor="#111113"
+            android:pathData="M 73,37 L 69,26 L 63,37 Z" />
+        <path
+            android:fillColor="#111113"
+            android:pathData="M 54,49 A 13,13 0 1 0 54,75 A 13,13 0 1 0 54,49 Z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M 54,54 A 8,8 0 1 0 54,70 A 8,8 0 1 0 54,54 Z" />
+        <path
+            android:fillColor="#111113"
+            android:pathData="M 54,58 A 4,4 0 1 0 54,66 A 4,4 0 1 0 54,58 Z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M 56,57 A 1.5,1.5 0 1 0 56,60 A 1.5,1.5 0 1 0 56,57 Z" />
+        <path
+            android:fillColor="#111113"
+            android:strokeColor="#111113"
+            android:strokeWidth="1.2"
+            android:strokeLineCap="round"
+            android:pathData="M 24,60 L 31,60 M 24,64 L 31,64 M 77,60 L 84,60 M 77,64 L 84,64" />
+        <path
+            android:fillColor="#111113"
+            android:pathData="M 52,73 L 56,73 L 54,76 Z" />
+    </group>
+</vector>

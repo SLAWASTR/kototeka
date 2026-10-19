@@ -40,18 +40,29 @@
     
     <div class="header-actions">
       <a href="https://finance.ozon.ru/apps/sbp/ozonbankpay/01a155d9-e962-7ffe-aa0c-ac329362226c" target="_blank" class="header-donate-btn" title="Поддержать автора (Ozon Банк / СБП)">
-        <span class="donate-btn-heart">❤️</span>
+        <svg class="donate-btn-heart" width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
         <span class="donate-btn-label">Донат</span>
       </a>
       <button type="button" id="userProfileBtn" class="header-user-pill" onclick="window.app.promptChangeUsername()" title="Сменить имя котолова">
-        <span class="user-pill-avatar">🐾</span>
+        <svg class="user-pill-avatar" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
         <span id="usernameDisplay">slawastr</span>
       </button>
       <button type="button" id="themeToggleBtn" class="header-icon-btn" title="Сменить тему оформления">
-        <span id="themeToggleIcon">🌙</span>
+        <svg id="themeToggleIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
       </button>
       <button type="button" id="backupModalBtn" class="header-icon-btn" onclick="window.app.openBackupModal()" title="Резервное копирование">
-        <span>💾</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
       </button>
     </div>
   </header>
@@ -61,7 +72,10 @@
     <!-- Controls: Search & Native Filter Button -->
     <section class="gallery-controls-section">
       <div class="search-box">
-        <span class="search-icon">🔍</span>
+        <svg class="search-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
         <input type="text" id="catSearchInput" class="search-input" placeholder="Поиск по кличке, улице, заметке...">
         <button type="button" id="searchClearBtn" class="search-clear-btn" style="display:none;" title="Очистить поиск">✕</button>
       </div>
@@ -100,8 +114,11 @@
           </svg>
         </button>
 
-        <button type="button" id="soundToggleBtn" class="btn-tool-icon" title="Звуки мурчания">
-          <span id="soundIcon">🔊</span>
+        <button type="button" id="soundToggleBtn" class="btn-tool-icon" title="Звуки">
+          <svg id="soundIconSvg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
         </button>
       </div>
     </section>
@@ -189,26 +206,50 @@
     </div>
   </section>
 
-  <!-- Bottom Navigation Bar -->
+  <!-- Bottom Navigation Bar (Material 3 Expressive) -->
   <nav class="bottom-nav">
     <button class="nav-item active" data-tab="gallery">
-      <span class="nav-icon">🐱</span>
+      <div class="nav-icon-wrap">
+        <svg class="nav-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5c-4 0-7.5 2.5-7.5 7 0 3 2 5.5 5 6.5.5.2 1.5.5 2.5.5s2-.3 2.5-.5c3-1 5-3.5 5-6.5 0-4.5-3.5-7-7.5-7z"/>
+          <path d="M4.5 12L3 5l6 3M19.5 12L21 5l-6 3"/>
+          <circle cx="9" cy="12" r="1.2" fill="currentColor"/>
+          <circle cx="15" cy="12" r="1.2" fill="currentColor"/>
+        </svg>
+      </div>
       <span class="nav-label">Кототека</span>
     </button>
     
     <div class="fab-container">
       <button id="fabAddCat" class="fab-button" title="Добавить нового котика">
-        <span class="fab-plus-symbol">＋</span>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
       </button>
     </div>
 
     <button class="nav-item" data-tab="map">
-      <span class="nav-icon">🗺️</span>
+      <div class="nav-icon-wrap">
+        <svg class="nav-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+          <line x1="8" y1="2" x2="8" y2="18"></line>
+          <line x1="16" y1="6" x2="16" y2="22"></line>
+        </svg>
+      </div>
       <span class="nav-label">Карта</span>
     </button>
 
     <button class="nav-item" data-tab="achievements">
-      <span class="nav-icon">🏆</span>
+      <div class="nav-icon-wrap">
+        <svg class="nav-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"></path>
+          <path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"></path>
+          <path d="M4 22h16"></path>
+          <path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1h10v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"></path>
+          <path d="M6 3h12v7a6 6 0 0 1-12 0V3z"></path>
+        </svg>
+      </div>
       <span class="nav-label">Ачивки</span>
     </button>
   </nav>
