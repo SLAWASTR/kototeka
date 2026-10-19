@@ -10,11 +10,16 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowInsetsController;
+import android.view.WindowManager;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -52,6 +57,14 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Configure system bars (Status bar & Navigation bar) to match dark theme by default
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(Color.parseColor("#090A0C"));
+            window.setNavigationBarColor(Color.parseColor("#090A0C"));
+        }
 
         webView = new WebView(this);
         setContentView(webView);
@@ -169,6 +182,41 @@ public class MainActivity extends Activity {
     }
 
     public class WebAppInterface {
+
+        @JavascriptInterface
+        public void setSystemBarColors(final String statusBarHex, final String navBarHex, final boolean isDark) {
+            runOnUiThread(() -> {
+                try {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        Window window = getWindow();
+                        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                        int statusColor = Color.parseColor(statusBarHex);
+                        int navColor = Color.parseColor(navBarHex);
+                        window.setStatusBarColor(statusColor);
+                        window.setNavigationBarColor(navColor);
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            WindowInsetsController controller = window.getInsetsController();
+                            if (controller != null) {
+                                int appearance = isDark ? 0 : (WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);
+                                controller.setSystemBarsAppearance(appearance, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);
+                            }
+                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            View decor = window.getDecorView();
+                            int flags = decor.getSystemUiVisibility();
+                            if (isDark) {
+                                flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                            } else {
+                                flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                            }
+                            decor.setSystemUiVisibility(flags);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
 
         @JavascriptInterface
         public void shareToTelegram(final String text, final String url) {

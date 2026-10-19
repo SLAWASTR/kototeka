@@ -45,7 +45,7 @@
         </svg>
         <span class="donate-btn-label">Донат</span>
       </a>
-      <button type="button" id="userProfileBtn" class="header-user-pill" onclick="window.app.promptChangeUsername()" title="Сменить имя котолова">
+      <button type="button" id="userProfileBtn" class="header-user-pill" onclick="window.app.switchTab('profile')" title="Профиль котолова">
         <svg class="user-pill-avatar" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
@@ -206,11 +206,164 @@
     </div>
   </section>
 
-  <!-- Bottom Navigation Bar (Material 3 Expressive) -->
+  <!-- =========================================================================
+       TAB 4: Профиль и настройки котолова (Profile & Settings)
+       ========================================================================= -->
+  <section id="profileScreen" class="tab-screen">
+    <div class="profile-screen-wrap">
+      <!-- User Profile Header Card -->
+      <div class="profile-hero-card">
+        <div class="profile-avatar-wrap">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <div class="profile-info-block">
+          <div class="profile-name-row">
+            <h2 id="profileUsernameDisplay" class="profile-username">slawastr</h2>
+            <button type="button" class="btn-profile-edit" onclick="window.app.promptChangeUsername()" title="Сменить имя">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="profile-badge-pill">🐾 Главный котолов</div>
+        </div>
+      </div>
+
+      <!-- Quick Stats Row -->
+      <div class="profile-stats-grid">
+        <div class="profile-stat-box">
+          <div id="profStatTotal" class="profile-stat-val">0</div>
+          <div class="profile-stat-lbl">Котов в базе</div>
+        </div>
+        <div class="profile-stat-box">
+          <div id="profStatAch" class="profile-stat-val">0/18</div>
+          <div class="profile-stat-lbl">Ачивок</div>
+        </div>
+        <div class="profile-stat-box">
+          <div id="profStatTopColor" class="profile-stat-val">—</div>
+          <div class="profile-stat-lbl">Топ окрас</div>
+        </div>
+      </div>
+
+      <!-- Settings Group: Appearance -->
+      <div class="profile-section-card">
+        <div class="profile-card-header">
+          <span class="profile-card-title">Оформление и звук</span>
+        </div>
+        <div class="profile-setting-row" onclick="window.app.toggleTheme()">
+          <div class="setting-row-left">
+            <div class="setting-icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="setting-title">Тема оформления</div>
+              <div class="setting-desc">AMOLED чёрная или светлая тема</div>
+            </div>
+          </div>
+          <div class="setting-row-action">
+            <button type="button" class="btn-theme-switch" id="profileThemeToggleBtn">Переключить</button>
+          </div>
+        </div>
+
+        <div class="profile-setting-row" onclick="document.getElementById('soundToggleBtn').click()">
+          <div class="setting-row-left">
+            <div class="setting-icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="setting-title">Звуковые эффекты</div>
+              <div class="setting-desc">Звук камеры и уведомлений</div>
+            </div>
+          </div>
+          <div class="setting-row-action">
+            <span id="profileSoundStateText" class="setting-state-pill">Вкл</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Group: Data & Backups -->
+      <div class="profile-section-card">
+        <div class="profile-card-header">
+          <span class="profile-card-title">Резервное копирование</span>
+        </div>
+        <div class="profile-setting-row" onclick="window.app.exportBackup()">
+          <div class="setting-row-left">
+            <div class="setting-icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </div>
+            <div>
+              <div class="setting-title">Экспорт базы котиков</div>
+              <div class="setting-desc">Сохранить резервную копию или отправить в Telegram</div>
+            </div>
+          </div>
+          <div class="setting-row-action">
+            <span class="setting-action-arrow">›</span>
+          </div>
+        </div>
+
+        <div class="profile-setting-row" onclick="window.app.openBackupModal()">
+          <div class="setting-row-left">
+            <div class="setting-icon-box">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+            </div>
+            <div>
+              <div class="setting-title">Импорт коллекции</div>
+              <div class="setting-desc">Восстановить котиков из JSON-файла</div>
+            </div>
+          </div>
+          <div class="setting-row-action">
+            <span class="setting-action-arrow">›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Group: Developer Support -->
+      <div class="profile-section-card highlight-support-card">
+        <div class="profile-card-header">
+          <span class="profile-card-title">Поддержка разработчика</span>
+        </div>
+        <div class="profile-support-content">
+          <p class="profile-support-text">
+            «Кототека» создаётся с душой и абсолютно бесплатна. Если приложение приносит радость, угостите автора кофе или котиков вкусняшкой!
+          </p>
+          <a href="https://finance.ozon.ru/apps/sbp/ozonbankpay/01a155d9-e962-7ffe-aa0c-ac329362226c" target="_blank" class="profile-donate-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <span>Поддержать автора (Ozon / СБП)</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="profile-footer-info">
+        <div>Кототека 2.0 • Сборка 2.0.0</div>
+        <div>Разработчик: <b>slawastr</b> • С любовью к уличным котикам</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bottom Navigation Bar (Material 3 Expressive Monochrome - 5 Balanced Elements) -->
   <nav class="bottom-nav">
     <button class="nav-item active" data-tab="gallery">
       <div class="nav-icon-wrap">
-        <svg class="nav-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="nav-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 5c-4 0-7.5 2.5-7.5 7 0 3 2 5.5 5 6.5.5.2 1.5.5 2.5.5s2-.3 2.5-.5c3-1 5-3.5 5-6.5 0-4.5-3.5-7-7.5-7z"/>
           <path d="M4.5 12L3 5l6 3M19.5 12L21 5l-6 3"/>
           <circle cx="9" cy="12" r="1.2" fill="currentColor"/>
@@ -218,6 +371,17 @@
         </svg>
       </div>
       <span class="nav-label">Кототека</span>
+    </button>
+
+    <button class="nav-item" data-tab="map">
+      <div class="nav-icon-wrap">
+        <svg class="nav-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+          <line x1="8" y1="2" x2="8" y2="18"></line>
+          <line x1="16" y1="6" x2="16" y2="22"></line>
+        </svg>
+      </div>
+      <span class="nav-label">Карта</span>
     </button>
     
     <div class="fab-container">
@@ -229,20 +393,9 @@
       </button>
     </div>
 
-    <button class="nav-item" data-tab="map">
-      <div class="nav-icon-wrap">
-        <svg class="nav-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-          <line x1="8" y1="2" x2="8" y2="18"></line>
-          <line x1="16" y1="6" x2="16" y2="22"></line>
-        </svg>
-      </div>
-      <span class="nav-label">Карта</span>
-    </button>
-
     <button class="nav-item" data-tab="achievements">
       <div class="nav-icon-wrap">
-        <svg class="nav-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="nav-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"></path>
           <path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"></path>
           <path d="M4 22h16"></path>
@@ -251,6 +404,16 @@
         </svg>
       </div>
       <span class="nav-label">Ачивки</span>
+    </button>
+
+    <button class="nav-item" data-tab="profile">
+      <div class="nav-icon-wrap">
+        <svg class="nav-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+      <span class="nav-label">Профиль</span>
     </button>
   </nav>
 

@@ -1,6 +1,8 @@
 <resources>
-    <color name="primary">#EA580C</color>
-    <color name="primary_dark">#C2410C</color>
-    <color name="accent">#F97316</color>
-    <color name="background">#FFF7ED</color>
+    <color name="primary">#090A0C</color>
+    <color name="primary_dark">#000000</color>
+    <color name="accent">#111113</color>
+    <color name="background">#090A0C</color>
+    <color name="status_bar">#090A0C</color>
+    <color name="navigation_bar">#090A0C</color>
 </resources>

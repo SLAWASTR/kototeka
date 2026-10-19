@@ -99,6 +99,18 @@ class KototekaApp {
     if (metaColor) {
       metaColor.setAttribute('content', isDark ? '#090A0C' : '#F4F4F6');
     }
+
+    if (window.AndroidBridge && window.AndroidBridge.setSystemBarColors) {
+      try {
+        window.AndroidBridge.setSystemBarColors(
+          isDark ? '#090A0C' : '#F4F4F6',
+          isDark ? '#090A0C' : '#FFFFFF',
+          isDark
+        );
+      } catch (e) {
+        console.warn('AndroidBridge.setSystemBarColors error:', e);
+      }
+    }
   }
 
   toggleTheme() {
@@ -168,6 +180,10 @@ class KototekaApp {
           iconSvg.innerHTML = window.soundMuted 
             ? '<line x1="1" y1="1" x2="23" y2="23"></line><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>'
             : '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
+        }
+        const soundText = document.getElementById('profileSoundStateText');
+        if (soundText) {
+          soundText.textContent = window.soundMuted ? 'Выкл' : 'Вкл';
         }
       });
     }
@@ -490,6 +506,11 @@ class KototekaApp {
     const activeScreen = document.getElementById(tab + 'Screen');
     if (activeScreen) {
       activeScreen.classList.add('active');
+    }
+
+    if (tab === 'profile') {
+      this.updateStats();
+      this.renderUsername();
     }
 
     if (tab === 'map') {
@@ -1364,6 +1385,8 @@ class KototekaApp {
     const unlocked = window.achievementManager.getUnlockedList();
     const countEl = document.getElementById('achUnlockedCount');
     if (countEl) countEl.textContent = `${unlocked.length}/${window.ACHIEVEMENTS_DEF.length}`;
+    const profAch = document.getElementById('profStatAch');
+    if (profAch) profAch.textContent = `${unlocked.length}/${window.ACHIEVEMENTS_DEF.length}`;
 
     listContainer.innerHTML = window.ACHIEVEMENTS_DEF.map(ach => {
       const isDone = window.achievementManager.isUnlocked(ach.id);
@@ -1388,6 +1411,9 @@ class KototekaApp {
     const totalCatsEl = document.getElementById('statTotalCats');
     if (totalCatsEl) totalCatsEl.textContent = this.cats.length;
 
+    const profTotal = document.getElementById('profStatTotal');
+    if (profTotal) profTotal.textContent = this.cats.length;
+
     const colorCounts = {};
     this.cats.forEach(c => {
       if (c.color) colorCounts[c.color] = (colorCounts[c.color] || 0) + 1;
@@ -1402,6 +1428,20 @@ class KototekaApp {
     }
     const topColorEl = document.getElementById('statTopColor');
     if (topColorEl) topColorEl.textContent = topColor;
+
+    const profColor = document.getElementById('profStatTopColor');
+    if (profColor) profColor.textContent = topColor;
+
+    const achUnlockedEl = document.getElementById('achUnlockedCount');
+    const profAch = document.getElementById('profStatAch');
+    if (achUnlockedEl && profAch) {
+      profAch.textContent = achUnlockedEl.textContent;
+    }
+
+    const soundText = document.getElementById('profileSoundStateText');
+    if (soundText) {
+      soundText.textContent = window.soundMuted ? 'Выкл' : 'Вкл';
+    }
   }
 
   // --- Backup & Restore ---
@@ -1536,6 +1576,10 @@ class KototekaApp {
     const el = document.getElementById('usernameDisplay');
     if (el) {
       el.textContent = this.username;
+    }
+    const profEl = document.getElementById('profileUsernameDisplay');
+    if (profEl) {
+      profEl.textContent = this.username;
     }
   }
 

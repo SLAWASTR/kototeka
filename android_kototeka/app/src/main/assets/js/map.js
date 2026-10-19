@@ -134,7 +134,7 @@ class KototekaMap {
         // Flash pulsating user circle
         const userDot = L.circleMarker(coords, {
           radius: 8,
-          fillColor: '#EA580C',
+          fillColor: '#111113',
           fillOpacity: 0.9,
           color: '#FFFFFF',
           weight: 3
