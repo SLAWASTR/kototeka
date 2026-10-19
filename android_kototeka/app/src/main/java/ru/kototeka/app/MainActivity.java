@@ -238,6 +238,80 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public void saveBackupJson(final String jsonString) {
+            runOnUiThread(() -> {
+                try {
+                    String filename = "kototeka_backup_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".json";
+                    OutputStream fos = null;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
+                        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/json");
+                        contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/Кототека");
+                        Uri fileUri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues);
+                        if (fileUri != null) {
+                            fos = getContentResolver().openOutputStream(fileUri);
+                        }
+                    } else {
+                        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                        File kototekaDir = new File(dir, "Кототека");
+                        if (!kototekaDir.exists()) kototekaDir.mkdirs();
+                        File file = new File(kototekaDir, filename);
+                        fos = new FileOutputStream(file);
+                    }
+                    if (fos != null) {
+                        fos.write(jsonString.getBytes("UTF-8"));
+                        fos.flush();
+                        fos.close();
+                        Toast.makeText(MainActivity.this, "💾 Резервная копия сохранена в папку Загрузки/Кототека!", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Не удалось создать файл бэкапа", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Ошибка сохранения: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void shareBackupFile(final String jsonString) {
+            runOnUiThread(() -> {
+                try {
+                    File cachePath = new File(getCacheDir(), "backups");
+                    if (!cachePath.exists()) cachePath.mkdirs();
+                    File file = new File(cachePath, "kototeka_backup.json");
+                    FileOutputStream fos = new FileOutputStream(file);
+                    fos.write(jsonString.getBytes("UTF-8"));
+                    fos.flush();
+                    fos.close();
+
+                    Uri contentUri = FileProvider.getUriForFile(
+                        MainActivity.this,
+                        getPackageName() + ".fileprovider",
+                        file
+                    );
+
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("application/json");
+                    intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+                    intent.putExtra(Intent.EXTRA_TEXT, "🐾 Резервная копия коллекции «Кототека»");
+                    intent.setClipData(ClipData.newRawUri("", contentUri));
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+                    for (ResolveInfo resolveInfo : resInfoList) {
+                        String packageName = resolveInfo.activityInfo.packageName;
+                        grantUriPermission(packageName, contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    }
+
+                    startActivity(Intent.createChooser(intent, "Сохранить резервную копию (в Telegram или Файлы)"));
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Ошибка отправки бэкапа: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @JavascriptInterface
         public void shareImage(final String base64Data, final String text) {
             runOnUiThread(() -> {
                 try {

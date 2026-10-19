@@ -1410,14 +1410,34 @@ class KototekaApp {
   }
 
   async exportBackup() {
-    const jsonStr = await window.catDb.exportAll();
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `kototeka_backup_${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const jsonStr = await window.catDb.exportAll();
+
+      // 1. If running inside native Android APK, use AndroidBridge
+      if (window.AndroidBridge) {
+        if (window.AndroidBridge.saveBackupJson) {
+          window.AndroidBridge.saveBackupJson(jsonStr);
+          return;
+        }
+        if (window.AndroidBridge.shareBackupFile) {
+          window.AndroidBridge.shareBackupFile(jsonStr);
+          return;
+        }
+      }
+
+      // 2. Browser fallback
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `kototeka_backup_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert('Ошибка экспорта: ' + e.message);
+    }
   }
 
   async importBackup(event) {
